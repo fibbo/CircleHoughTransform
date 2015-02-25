@@ -1,12 +1,12 @@
 #default python imports
-import sys
 import math
 import matplotlib.pyplot as plt
+import scipy.constants as sciconst
 
 from Histogram import Histogram
+from Histogram2D import Histogram2D
 from Tools import *
 
-import pdb
 
 def createHistograms(data):
   """ Fill a different histogram for circle centers with the distance between all points and the
@@ -61,6 +61,21 @@ def findRadiusClusters(histograms):
 
   return res
         
+def HoughTransform2D( data ):
+  histograms = create2DHistograms( data )
+
+
+def create2DHistograms( self, data ):
+  step = sciconst.pi/100
+  thetas = []
+  tmp = 0.
+  for aa in xrange( 100 ):
+      tmp += step
+      thetas.append( tmp )
+  
+  for r in data['Radius']:
+    a = [] #x coordinate of the circle 
+    b = []
 
 def HoughTransform(data):
 
@@ -91,9 +106,7 @@ if __name__ == '__main__':
     sys.exit( 'please provide file to be read' )
   path = sys.argv[1]
   data = readFile(path)
-  centers = [(-0.342,-0.994), (-0.821,-0.656), (-0.261,-0.328)]
-  data['Center'] = centers
-  HoughTransform(data)
+  
   print 'The End'
   
 

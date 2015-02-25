@@ -12,7 +12,8 @@ def readFile( filename ):
     f = open( filename, 'r' )
   except Exception, e:
     sys.exit(e)
-  points = []
+  center = []
+  radius = []
   x = []
   y = []
   for line in f:
@@ -20,4 +21,11 @@ def readFile( filename ):
         sep = line.split()
         x.append(float(sep[1]))
         y.append(float(sep[2]))
-  return { 'x' : x, 'y' : y }
+    if 'Center' in line:
+      sep = line.split()
+      center.append( sep[8] )
+    if 'Radius' in line:
+      sep = line.split()
+      radius.append( sep[6] )
+
+  return { 'x' : x, 'y' : y, 'Center' : center, 'Radius' : radius }
