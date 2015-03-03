@@ -45,7 +45,7 @@ def findRadiusClusters( histograms ):
     temp = []
     j = 0
     for entry in h.hist:
-      if entry > 5:
+      if entry > 2:
         clusters.append( j )
       j += 1
     for cid in clusters:
@@ -128,13 +128,12 @@ def find2DCluster( data, neighbor_weights = False, weight_factor = 0.5 ):
   """
   centers = []
   gridSumValue = []
-  print '###########'
   for w in data['Results']:
     max_value = 0.
     it = np.nditer( w, flags = ['multi_index'] )
     while not it.finished:
+      gridSum = 0
       if neighbor_weights:
-        gridSum = 0
         i, j = it.multi_index
         if not i - 1 < 0:
           gridSum += weight_factor * w[i - 1][j]
@@ -144,26 +143,65 @@ def find2DCluster( data, neighbor_weights = False, weight_factor = 0.5 ):
           gridSum += weight_factor * w[i + 1][j]
         if not j + 1 >= len( w ):
           gridSum += weight_factor * w[i][j + 1]
-        gridSum += 2 * weight_factor * it[0]
+        gridSum += it[0]
+        if gridSum > max_value:
+          max_value = gridSum
+          imax, jmax = i, j
       else:
         gridSum = it[0]
-        print it[0]
       if gridSum > max_value:
         max_value = it[0]
-        i, j = it.multi_index
+        imax, jmax = it.multi_index
       it.iternext()
-    print '#################'
-    centers.append( ( data['xbins'][i], data['ybins'][j] ) )
+    centers.append( ( data['xbins'][imax], data['ybins'][jmax] ) )
     gridSumValue.append( gridSum )
 
   data['CalcCenter'] = centers
   data['GridSum'] = gridSumValue
 
 
+def findMax( matrices, neighbor_weights = False, weight_factor = 0.5 ):
+  """ Finds maximum of a 2d array,
+
+  :param matrices: list of matrices
+  :returns indices and maximum value found.
+
+  """
+  results = []
+  for w in matrices:
+    max_entry = 0
+    it = np.nditer( w, flags = ['multi_index'] )
+    while not it.finished:
+      if neighbor_weights:
+        gridSum = 0
+        i, j = it.multi_index
+#         if not i - 1 < 0:
+#           gridSum += weight_factor * w[i - 1][j]
+#         if not j - 1 < 0:
+#           gridSum += weight_factor * w[i][j - 1]
+#         if not i + 1 >= len( w ):
+#           gridSum += weight_factor * w[i + 1][j]
+#         if not j + 1 >= len( w ):
+#           gridSum += weight_factor * w[i][j + 1]
+        gridSum = it[0]
+      else:
+        gridSum = it[0]
+      if gridSum > max_entry:
+        max_entry = gridSum
+        i, j = it.multi_index
+      it.iternext()
+
+    results.append( ( max_entry, ( i, j ) ) )
+
+  return results
+
+def inverseWeight( weight_matrix, radius, x, y, data ):
+  for x0, y0 in zip( data['x'], data['y'] ):
+    weight_matrix += 1.0 / ( np.abs( ( x - x0 ) ** 2 + ( y - y0 ) ** 2 - radius ** 2 ) + 10e-3 )
+  return weight_matrix
 
 
-
-def calculateWeights( data, dim = 100 ):
+def calculateWeights( data, weight_function, dim = 100 ):
   """ We create a histogram from xmin to xmax and ymin to ymax and calculate then the distances from the grid
       points to the input points. if a grid point has the same distance to several input points it could be that
       this grid point is the center of a circle on which the input points lie
@@ -182,10 +220,11 @@ def calculateWeights( data, dim = 100 ):
   x, y = np.broadcast_arrays( xbins[..., np.newaxis], ybins[np.newaxis, ...] )
   for r in data['Radius']:
     w = np.zeros( ( dim, dim ) )
-    for x0, y0 in zip( data['x'], data['y'] ):
-      w += 1.0 / ( np.abs( ( x - x0 ) ** 2 + ( y - y0 ) ** 2 - r ** 2 ) + 10e-6 )
+    res = weight_function( w, r, x, y, data )
+#     for x0, y0 in zip( data['x'], data['y'] ):
+#       w += 1.0 / ( np.abs( ( x - x0 ) ** 2 + ( y - y0 ) ** 2 - r ** 2 ) + 10e-3 )
 
-    results.append( w )
+    results.append( res )
   data['xbins'] = xbins
   data['ybins'] = ybins
   data['Results'] = results
@@ -218,11 +257,13 @@ if __name__ == '__main__':
   data = readFile(path)
 
 #### run spefici methods ####
+  calculateWeights( data, inverseWeight, dim = 50 )
+  find2DCluster( data, neighbor_weights = False, weight_factor = 0.1 )
+  res = findMax( data['Results'] )
 
-  calculateWeights( data, dim = 100 )
-  find2DCluster( data, neighbor_weights = False, weight_factor = 0.5 )
-  print data['CalcCenter']
-  print data['GridSum']
+  for max, coord in res:
+    print '(%s, %s)' % ( data['xbins'][coord[0]], data['ybins'][coord[1]] )
+  # print data['GridSum']
   visualize( data )
 
   print 'The End'
