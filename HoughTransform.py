@@ -1,4 +1,4 @@
-#default python imports
+# default python imports
 from math import cos, sin, sqrt
 import matplotlib.pyplot as plt
 import scipy.constants as sconst
@@ -19,7 +19,6 @@ def HoughTransform( data ):
 
   fig = plt.gcf()
   for radius in radiuses:
-    # pdb.set_trace()
     if not radius['Radius']:
       continue
 
@@ -57,11 +56,6 @@ def findRadiusClusters( histograms ):
 
   return res
 
-def HoughTransform2D( data ):
-  histograms = create2DHistograms( data )
-  for h in histograms:
-    h.printHistogramVariables()()
-
 def calcCircles( data, r ):
   step = 2 * sconst.pi / 100
   a = []
@@ -85,7 +79,7 @@ def create2DHistograms( data ):
 
   return histograms
 
-def createHistograms(data):
+def createHistograms( data ):
   """ Fill a different histogram for circle centers with the distance between all points and the
       respective center of the circle.
       :param double x, list of x coordinates
@@ -99,8 +93,8 @@ def createHistograms(data):
     h = Histogram( 0.001, 0.29, 1.1, ( a, b ) )
     res = calcRadius( data, a, b )
     for radius in res['Radius']:
-      h.addValue(radius)
-    histograms.append(h)
+      h.addValue( radius )
+    histograms.append( h )
   return histograms
 
 def calcRadius( data, a, b ):
@@ -124,7 +118,7 @@ def find2DCluster( data, neighbor_weights = False, weight_factor = 0.5 ):
       :param dict data: data dict with the 'Results' key which contains the weight matrices
       :param returns: adds 'CalcCenter' key to the data dict with the found centers for all
                       weight matrices
-  
+
   """
   centers = []
   gridSumValue = []
@@ -159,45 +153,16 @@ def find2DCluster( data, neighbor_weights = False, weight_factor = 0.5 ):
   data['CalcCenter'] = centers
   data['GridSum'] = gridSumValue
 
-
-def findMax( matrices, neighbor_weights = False, weight_factor = 0.5 ):
-  """ Finds maximum of a 2d array,
-
-  :param matrices: list of matrices
-  :returns indices and maximum value found.
-
-  """
-  results = []
-  for w in matrices:
-    max_entry = 0
-    it = np.nditer( w, flags = ['multi_index'] )
-    while not it.finished:
-      if neighbor_weights:
-        gridSum = 0
-        i, j = it.multi_index
-#         if not i - 1 < 0:
-#           gridSum += weight_factor * w[i - 1][j]
-#         if not j - 1 < 0:
-#           gridSum += weight_factor * w[i][j - 1]
-#         if not i + 1 >= len( w ):
-#           gridSum += weight_factor * w[i + 1][j]
-#         if not j + 1 >= len( w ):
-#           gridSum += weight_factor * w[i][j + 1]
-        gridSum = it[0]
-      else:
-        gridSum = it[0]
-      if gridSum > max_entry:
-        max_entry = gridSum
-        i, j = it.multi_index
-      it.iternext()
-
-    results.append( ( max_entry, ( i, j ) ) )
-
-  return results
-
 def inverseWeight( weight_matrix, radius, x, y, data ):
   for x0, y0 in zip( data['x'], data['y'] ):
     weight_matrix += 1.0 / ( np.abs( ( x - x0 ) ** 2 + ( y - y0 ) ** 2 - radius ** 2 ) + 10e-3 )
+  return weight_matrix
+
+def gaussWeight( weight_matrix, radius, x, y, data ):
+  for x0, y0 in zip( data['x'], data['y'] ):
+    s = 2 * data['bin_width']
+    eta = ( x - x0 ) ** 2 + ( y - y0 ) ** 2 - radius ** 2
+    weight_matrix += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 ) / ( 2 * s ** 2 ) )
   return weight_matrix
 
 
@@ -215,16 +180,17 @@ def calculateWeights( data, weight_function, dim = 100 ):
   ymax = 1.0
   # divide the x and y axis in [steps] equal parts from 0 to 1
   i = ( np.arange( 0, 100, 100. / dim ) + 0.5 ) / 100
+  data['bin_width'] = 1. / dim
   xbins = xmin + i * ( xmax - xmin )
   ybins = ymin + i * ( ymax - ymin )
   x, y = np.broadcast_arrays( xbins[..., np.newaxis], ybins[np.newaxis, ...] )
   for r in data['Radius']:
     w = np.zeros( ( dim, dim ) )
     res = weight_function( w, r, x, y, data )
-#     for x0, y0 in zip( data['x'], data['y'] ):
-#       w += 1.0 / ( np.abs( ( x - x0 ) ** 2 + ( y - y0 ) ** 2 - r ** 2 ) + 10e-3 )
+
 
     results.append( res )
+  print xbins, ybins
   data['xbins'] = xbins
   data['ybins'] = ybins
   data['Results'] = results
@@ -239,11 +205,19 @@ def visualize( data ):
 
   plt.scatter( data['x'], data['y'] )
   fig = plt.gcf()
+#   ax1 = plt.subplot( 1, 1, 1 )
+#   x0, x1 = ax1.get_xlim()
+#   y0, y1 = ax1.get_ylim()
+#   print ax1
+  colors = ['red', 'blue', 'green', 'yellow', 'purple']
+
   for c, r in zip( data['CalcCenter'], data['Radius'] ):
-    fig.gca().add_artist( plt.Circle( ( c[0], c[1] ), r, fill = False, color = 'red' ) )
-  fig.gca().add_artist( plt.Circle( ( data['Center'][2][0], data['Center'][2][1] ), data['Radius'][2], fill = False, color = 'black' ) )
-  fig.gca().add_artist( plt.Circle( ( data['Center'][0][0], data['Center'][0][1] ), data['Radius'][0], fill = False, color = 'black' ) )
-  fig.gca().add_artist( plt.Circle( ( data['Center'][1][0], data['Center'][1][1] ), data['Radius'][1], fill = False, color = 'black' ) )
+    fig.gca().add_artist( plt.Circle( ( c[0], c[1] ), r, fill = False, color = 'grey' ) )
+
+  i = 0
+  for c1, c2 in data['Center']:
+    fig.gca().add_artist( plt.Circle( ( c1, c2 ), data['Radius'][i], fill = False, color = colors[i] ) )
+    i += 1
 
   plt.show()
 
@@ -251,23 +225,26 @@ def visualize( data ):
 if __name__ == '__main__':
 
 #### read data #####
-  if len(sys.argv) < 2:
+  if len( sys.argv ) < 2:
     sys.exit( 'please provide file to be read' )
   path = sys.argv[1]
-  data = readFile(path)
+  data = readFile( path )
 
-#### run spefici methods ####
-  calculateWeights( data, inverseWeight, dim = 50 )
-  find2DCluster( data, neighbor_weights = False, weight_factor = 0.1 )
-  res = findMax( data['Results'] )
+#### run specific methods ####
+  calculateWeights( data, gaussWeight, dim = 200 )
+  find2DCluster( data, neighbor_weights = False, weight_factor = 0.5 )
 
-  for max, coord in res:
-    print '(%s, %s)' % ( data['xbins'][coord[0]], data['ybins'][coord[1]] )
+
+  colors = ['red', 'blue', 'green', 'yellow', 'purple']
+  i = 0
+  for c1, c2 in data['CalcCenter']:
+    print "(%s, %s) - %s" % ( c1, c2, colors[i] )
+    i += 1
   # print data['GridSum']
   visualize( data )
 
   print 'The End'
-  
 
-  
-  #h.printHistogramVariables()
+
+
+  # h.printHistogramVariables()
