@@ -5,6 +5,7 @@ import scipy.constants as sconst
 import numpy as np
 import pdb
 import sys
+import random
 
 from Tools import readFile
 
@@ -35,7 +36,7 @@ def visualize( data ):
 #   print ax1
   colors = ['red', 'blue', 'green', 'yellow', 'purple']
 
-  for c, r in zip( data['CalcCenter'], data['Radius'] ):
+  for c, r in zip( data['Results'], data['Radius'] ):
     fig.gca().add_artist( plt.Circle( ( c[0], c[1] ), r, fill = False, color = 'grey' ) )
 
   i = 0
@@ -80,7 +81,7 @@ def removePoints( center, data, r ):
   used_x = []
   used_y = []
   for x0, y0 in zip( data['x'], data['y'] ):
-    if ( ( x0 - center[0] ) ** 2 + ( y0 - center[1] ** 2 ) - r ** 2 ) < 0.01:
+    if ( abs( ( x0 - center[0] ) ** 2 + ( y0 - center[1] ) ** 2 - r ** 2 ) ) < 0.01:
       used_x.append( data['x'].pop( i ) )
       used_y.append( data['y'].pop( i ) )
     else:
@@ -101,6 +102,7 @@ def findCenter( w, data, neighbor_weights = False, weight_factor = 0.5 ):
   """
   max_value = 0.
   it = np.nditer( w, flags = ['multi_index'] )
+  imax, jmax = 0, 0
   while not it.finished:
     gridSum = 0
     if neighbor_weights:
@@ -123,7 +125,6 @@ def findCenter( w, data, neighbor_weights = False, weight_factor = 0.5 ):
       max_value = it[0]
       imax, jmax = it.multi_index
     it.iternext()
-  pdb.set_trace()
   center = ( data['xbins'][imax], data['ybins'][jmax] )
 
   return center
@@ -136,14 +137,15 @@ if __name__ == '__main__':
     sys.exit( 'please provide file to be read' )
   path = sys.argv[1]
   data = readFile( path )
-
+  x, y = data['x'], data['y']
+  combined = zip( data['Center'], data['Radius'] )
+  random.shuffle( combined )
+  data['Center'][:], data['Radius'][:] = zip( *combined )
 #### run specific methods ####
-  calculateWeights( data, gaussWeight, 100 )
+  calculateWeights( data, gaussWeight, 300 )
+  data['x'], data['y'] = x, y
+  visualize( data )
 
-  colors = ['red', 'blue', 'green', 'yellow', 'purple']
-  i = 0
-  # print data['GridSum']
-#  visualize( data )
 
   print 'The End'
 
