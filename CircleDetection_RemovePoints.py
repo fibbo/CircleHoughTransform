@@ -137,13 +137,23 @@ if __name__ == '__main__':
     sys.exit( 'please provide file to be read' )
   path = sys.argv[1]
   data = readFile( path )
+
+  # saving the data points since some points get removed in  the algorithm
   x, y = data['x'], data['y']
+
+  # shuffle the order the radiuses - algorithm shouldnt depend on the order
+  # which it does at the moment - also shuffling the centers with the radiuses
+  # or during the visualisation wrong centers get match with wrong radiuses
   combined = zip( data['Center'], data['Radius'] )
   random.shuffle( combined )
   data['Center'][:], data['Radius'][:] = zip( *combined )
+
 #### run specific methods ####
   calculateWeights( data, gaussWeight, 300 )
+
+  # restore initial data points so the plot includes all data points (noise included)
   data['x'], data['y'] = x, y
+
   visualize( data )
 
 
