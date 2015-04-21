@@ -12,16 +12,16 @@ def readFile( filename ):
   try:
     f = open( filename, 'r' )
   except Exception, e:
-    sys.exit(e)
+    sys.exit( e )
   center = []
   radius = []
   x = []
   y = []
   for line in f:
-    if not line.startswith('#'):
+    if not line.startswith( '#' ):
         sep = line.split()
-        x.append(float(sep[1]))
-        y.append(float(sep[2]))
+        x.append( float( sep[1] ) )
+        y.append( float( sep[2] ) )
     if 'Center' in line:
       sep = line.split()
       tmp = literal_eval( sep[8] )
