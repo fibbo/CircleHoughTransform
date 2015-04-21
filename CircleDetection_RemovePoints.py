@@ -27,9 +27,11 @@ def visualize( data ):
 
       :param dict data. data holds all the information
   """
-
+#   plt.ylim( -2, 1 )
+#   plt.xlim( -2, 1 )
   plt.scatter( data['x'], data['y'] )
   fig = plt.gcf()
+
 #   ax1 = plt.subplot( 1, 1, 1 )
 #   x0, x1 = ax1.get_xlim()
 #   y0, y1 = ax1.get_ylim()
@@ -77,6 +79,12 @@ def calculateWeights( data, weight_function, dim = 100 ):
 
 
 def removePoints( center, data, r ):
+  """ Given a center point we found we remove points that are on those circle.
+
+  :params float tuple center: (cx, cy) x and y coordinate of the center
+  :params dict data: contains the data points
+
+  """
   i = 0
   used_x = []
   used_y = []
@@ -87,6 +95,8 @@ def removePoints( center, data, r ):
     else:
       i += 1
 
+  return zip( used_x, used_y )
+
 def findCenter( w, data, neighbor_weights = False, weight_factor = 0.5 ):
   """ Goes through the weight matrix and finds the highest value or the highest cluster of values.
       If neighbor_weights is false just the matrix point itself is considered. If neighbor_weights
@@ -96,8 +106,7 @@ def findCenter( w, data, neighbor_weights = False, weight_factor = 0.5 ):
       circle
 
       :param dict data: data dict with the 'Results' key which contains the weight matrices
-      :param returns: adds 'CalcCenter' key to the data dict with the found centers for all
-                      weight matrices
+      :param returns: (cx, cy) a tuple with the x and y coordinate of the found center.
 
   """
   max_value = 0.
@@ -149,7 +158,7 @@ if __name__ == '__main__':
   data['Center'][:], data['Radius'][:] = zip( *combined )
 
 #### run specific methods ####
-  calculateWeights( data, gaussWeight, 300 )
+  calculateWeights( data, gaussWeight, 400 )
 
   # restore initial data points so the plot includes all data points (noise included)
   data['x'], data['y'] = x, y
