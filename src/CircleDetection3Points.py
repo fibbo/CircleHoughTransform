@@ -41,7 +41,7 @@ def findCircles( combinationsList ):
   radius_histogram = np.histogram( r, 100, [0, 1] )
   return center_histogram, radius_histogram
 
-if __name__ == '__main__':
+if __name__ == '__main__': 
   #### read data #####
   if len( sys.argv ) < 2:
     sys.exit( 'please provide file to be read' )
