@@ -12,18 +12,18 @@
 	"buffers":
 	[
 		{
-			"file": ".sublime-project",
+			"file": "src/CircleDetection3Points.py",
 			"settings":
 			{
-				"buffer_size": 463,
+				"buffer_size": 1388,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/CircleDetection3Points.py",
+			"file": "Circle.sublime-project",
 			"settings":
 			{
-				"buffer_size": 1356,
+				"buffer_size": 179,
 				"line_ending": "Windows"
 			}
 		}
@@ -35,10 +35,14 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 392.0,
-		"last_filter": "Package Control: ",
+		"height": 196.0,
+		"last_filter": "bro",
 		"selected_items":
 		[
+			[
+				"bro",
+				"Preferences: Browse Packages"
+			],
 			[
 				"Package Control: ",
 				"Package Control: Disable Package"
@@ -71,8 +75,20 @@
 		"side_bar_visible": false,
 		"status_bar_visible": false
 	},
+	"expanded_folders":
+	[
+		"/C/Users/Philipp/Documents/GitHub/CircleHoughTransform/src"
+	],
 	"file_history":
 	[
+		"/C/Users/Philipp/Documents/GitHub/CircleHoughTransform/src/5_circles.txt",
+		"/C/Users/Philipp/Documents/GitHub/CircleHoughTransform/src/CircleDetection_RemovePoints.py",
+		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/Philipp/Documents/GitHub/CircleHoughTransform/src/CircleDetection3Points.py",
+		"/C/Users/Philipp/Documents/GitHub/CircleHoughTransform/Circle.sublime-project",
+		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/Anaconda/anaconda_lib/autopep/autopep8_lib/lib2to3/fixes/fix_exec.py",
+		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/Anaconda/anaconda_lib/autopep/autopep8_lib/lib2to3/fixes/fix_execfile.py",
 		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/User/Anaconda.sublime-settings",
 		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/User/Python.sublime-settings",
 		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/LaTeXing/LaTeX.sublime-build",
@@ -81,8 +97,6 @@
 		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/LaTeXing/LaTeXing.sublime-settings",
 		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/User/LaTeXing.sublime-settings",
 		"/C/Users/Philipp/Documents/Python Scripts/anaconda_sublime_test.py",
-		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
-		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
 		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Default (Windows).sublime-keymap",
 		"/C/Users/Philipp/AppData/Roaming/Sublime Text 3/Packages/Anaconda/LICENSE",
 		"/C/Users/Philipp/Google Drive/Lectures/LaTeX-Kurs/LaTeX Beispiele/20 Uebungsdokument/Uebungsdokument.tex"
@@ -103,6 +117,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			" \"",
 			"biber"
 		],
 		"highlight": true,
@@ -126,27 +141,29 @@
 			[
 				{
 					"buffer": 0,
-					"file": ".sublime-project",
+					"file": "src/CircleDetection3Points.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 463,
+						"buffer_size": 1388,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								406,
-								410
+								214,
+								214
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": -0.0,
+						"translation.y": 495.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -154,24 +171,24 @@
 				},
 				{
 					"buffer": 1,
-					"file": "src/CircleDetection3Points.py",
+					"file": "Circle.sublime-project",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1356,
+						"buffer_size": 179,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1021,
-								1021
+								89,
+								89
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage",
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
@@ -224,8 +241,8 @@
 	{
 		"height": 0.0
 	},
-	"pinned_build_system": "",
-	"project": "CircleDetection3Points.sublime-project",
+	"pinned_build_system": "5_cirles Build",
+	"project": "Circle.sublime-project",
 	"replace":
 	{
 		"height": 42.0
@@ -266,7 +283,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 150.0,
+	"side_bar_width": 264.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
