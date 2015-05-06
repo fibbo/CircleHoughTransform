@@ -1,11 +1,11 @@
 # default python imports
-from math import cos, sin, sqrt
+from math import sqrt
 import matplotlib.pyplot as plt
 import scipy.constants as sconst
 import numpy as np
 import pdb
 import sys
-import random
+
 
 from Tools import readFile
 
@@ -27,15 +27,11 @@ def visualize( data ):
 
       :param dict data. data holds all the information
   """
-#   plt.ylim( -2, 1 )
-#   plt.xlim( -2, 1 )
+  plt.ylim( -2, 1 )
+  plt.xlim( -2, 1 )
   plt.scatter( data['x'], data['y'] )
   fig = plt.gcf()
 
-#   ax1 = plt.subplot( 1, 1, 1 )
-#   x0, x1 = ax1.get_xlim()
-#   y0, y1 = ax1.get_ylim()
-#   print ax1
   colors = ['red', 'blue', 'green', 'yellow', 'purple']
 
   for c, r in zip( data['Results'], data['Radius'] ):
@@ -48,12 +44,19 @@ def visualize( data ):
 
   plt.show()
 
-def calculateWeights( data, weight_function, dim = 100 ):
-  """ We create a histogram from xmin to xmax and ymin to ymax and calculate then the distances from the grid
-      points to the input points. if a grid point has the same distance to several input points it could be that
-      this grid point is the center of a circle on which the input points lie
+def findCircles( data, weight_function, dim = 100 ):
+  """ Define the plane, bin size and create an x and y array that are used for weight calculations.
+  Iterate through the data['Radius'] to find a suitable circle for the given radius.
+  The Circle finding goes through 4 steps:
+  1. Calculate a weight for each bin entry, meaning how likely it is for that bin to be a center of a circle for a given radius
+  2. Find the highest value in the weight matrix - this is the center for the circle
+  3. Remove data points data['x'] and data['y'] that lie on this circle
+  4. Add the center point to the results list
 
   :param dict data: Contains radius, x and y information. We fill it with xbins and ybins vectors and weight matrices
+  :param func weight_function: this is a function that is used to calculate the weight of a bin entry
+  :param int dim: Dimension of the histrogram per dimension
+  :returns Nothing, but adds the result list to the data object.
   """
   results = []
   xmin = -1.0
@@ -148,17 +151,18 @@ if __name__ == '__main__':
   data = readFile( path )
 
   # saving the data points since some points get removed in  the algorithm
-  x, y = data['x'], data['y']
 
+  x, y = list( data['x'] ), list( data['y'] )
   # shuffle the order the radiuses - algorithm shouldnt depend on the order
   # which it does at the moment - also shuffling the centers with the radiuses
   # or during the visualisation wrong centers get match with wrong radiuses
-  combined = zip( data['Center'], data['Radius'] )
-  random.shuffle( combined )
-  data['Center'][:], data['Radius'][:] = zip( *combined )
+  combined = zip( data['Center'], data['Radius'], data['nPoints'] )
+  combined = sorted( combined, key = lambda x: x[2], reverse = True )
+
+  data['Center'][:], data['Radius'][:], data['nPoints'] = zip( *combined )
 
 #### run specific methods ####
-  calculateWeights( data, gaussWeight, 400 )
+  findCircles( data, gaussWeight, 80 )
 
   # restore initial data points so the plot includes all data points (noise included)
   data['x'], data['y'] = x, y
