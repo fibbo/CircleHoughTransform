@@ -4,6 +4,7 @@ Created on Apr 29, 2015
 @author: phi
 '''
 from Tools import readFile2
+import matplotlib.pyplot as plt
 import sys
 import itertools
 import numpy as np
@@ -12,9 +13,7 @@ import pdb
 
 
 def findCircles( combinationsList ):
-  x = []
-  y = []
-  r = []
+  data = []
   for points in combinationsList:
     A = points[0]
     B = points[1]
@@ -44,7 +43,7 @@ def findCircles( combinationsList ):
 if __name__ == '__main__': 
   #### read data #####
   if len( sys.argv ) < 2:
-    sys.exit( 'please provide file to be read' )
+    sys.exit( 'Please provide file to be read' )
   path = sys.argv[1]
   data = readFile2( path )
   start_time = time.time()
