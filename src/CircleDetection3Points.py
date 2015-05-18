@@ -11,8 +11,8 @@ import itertools
 import numpy as np
 from timer import Timer
 
-
-NUMBER_OF_BINS = 2000
+NUMBER_OF_R_BINS = 1000 #bins for radius
+NUMBER_OF_S_BINS = 2000 #bins for space
 
 def findCircles( combinationsList ):
 #  data = []
@@ -31,7 +31,7 @@ def findCircles( combinationsList ):
     s = ( a + b + c ) / 2
 
     R = a * b * c / 4 / np.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) )
-    if not R > 1:
+    if R <= 1.:
       b1 = a ** 2 * ( b ** 2 + c ** 2 - a ** 2 )
       b2 = b ** 2 * ( a ** 2 + c ** 2 - b ** 2 )
       b3 = c ** 2 * ( a ** 2 + b ** 2 - c ** 2 )
@@ -41,8 +41,8 @@ def findCircles( combinationsList ):
       y.append( P[1] )
       r.append( R )
   
-  center_histogram, c_xedges, c_yedges = np.histogram2d( x, y, NUMBER_OF_BINS, [[-1, 1], [-1, 1]] )
-  radius_histogram, r_xedges = np.histogram( r, NUMBER_OF_BINS, [0, 1], normed=True )
+  center_histogram, c_xedges, c_yedges = np.histogram2d( x, y, NUMBER_OF_S_BINS, [[-1, 1], [-1, 1]] )
+  radius_histogram, r_xedges = np.histogram( r, NUMBER_OF_R_BINS, [0, 1], normed=True )
   center = {}
   center['H'] = center_histogram
   center['xedges'] = c_xedges
@@ -56,11 +56,12 @@ def findCircles( combinationsList ):
 def extractCenter( center ):
   centers = []
   H = center['H']
+  
   xedges = center['xedges']
   yedges = center['yedges']
   while len(centers) < 8:
     index = np.argmax(H)
-    xmax, ymax = np.unravel_index( index, (NUMBER_OF_BINS, NUMBER_OF_BINS) )
+    xmax, ymax = np.unravel_index( index, (NUMBER_OF_S_BINS, NUMBER_OF_S_BINS) )
     centers.append((xedges[xmax], yedges[ymax]))
     H[xmax][ymax] = 0
 
@@ -73,7 +74,7 @@ def extractRadius( radius ):
 
   while len(radiuses) < 8:
     index = np.argmax(H)
-    xmax = np.unravel_index( index, NUMBER_OF_BINS )
+    xmax = np.unravel_index( index, NUMBER_OF_R_BINS )
     radiuses.append(edges[xmax])
     H[xmax] = 0
   return radiuses
@@ -94,7 +95,7 @@ def visualizeCenterHistogram( center ):
   
   
 def visualizeRadiusHistogram( radius ):
-  step = 1./NUMBER_OF_BINS
+  step = 1./NUMBER_OF_R_BINS
   edges = np.arange(0,1,step)
   H = radius['H']
   plt.bar(edges,H, width=step)
@@ -109,7 +110,8 @@ if __name__ == '__main__':
   path = sys.argv[1]
   data = readFile2( path )
   with open( 'runtimes.txt', 'a' ) as f:
-    f.write("Number of Bins: %s\n" % NUMBER_OF_BINS)
+    f.write("Number of space bins: %s\n" % NUMBER_OF_S_BINS)
+    f.write("Number of radius bins: %s\n" % NUMBER_OF_R_BINS)
     totalRuntime = 0
     with Timer() as t:
       combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
@@ -133,6 +135,8 @@ if __name__ == '__main__':
     f.write("Total Runtime: %s s\n" % totalRuntime)
     f.write("#############\n")
   f.close()
-  #visualizeRadiusHistogram(radius)
+  print centers
+  print radiuses
+#  visualizeRadiusHistogram(radius)
 
   #visualize(center, radius)
