@@ -137,6 +137,6 @@ if __name__ == '__main__':
   f.close()
   print centers
   print radiuses
-#  visualizeRadiusHistogram(radius)
+  visualizeRadiusHistogram(radius)
 
-  #visualize(center, radius)
+  visualizeCenterHistogram(center)
