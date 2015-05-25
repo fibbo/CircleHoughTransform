@@ -155,7 +155,7 @@ if __name__ == '__main__':
 
 #### run specific methods ####
   start_time = time.time()
-  findCircles( data, gaussWeight, space_dim = 80, r_dim = 100 )
+  findCircles( data, gaussWeight, space_dim = 2000, r_dim = 100 )
 
   # restore initial data points so the plot includes all data points (noise included)
   # data['x'], data['y'] = x, y

@@ -1,0 +1,409 @@
+Number of Bins: 200
+=> elasped combinationsList: 0.0210349559784 s
+=> elasped findCircles: 3.67175006866 s
+=> elasped extractCenter: 0.000552177429199 s
+=> elasped extractRadius: 3.00407409668e-05 s
+Total Runtime: 3.69336724281 s
+#############
+Number of Bins: 400
+=> elasped combinationsList: 0.0208311080933 s
+=> elasped findCircles: 3.52910399437 s
+=> elasped extractCenter: 0.002032995224 s
+=> elasped extractRadius: 2.98023223877e-05 s
+Total Runtime: 3.55199790001 s
+#############
+Number of Bins: 600
+=> elasped combinationsList: 0.0215091705322 s
+=> elasped findCircles: 3.46970701218 s
+=> elasped extractCenter: 0.00498414039612 s
+=> elasped extractRadius: 3.69548797607e-05 s
+Total Runtime: 3.49623727798 s
+#############
+Number of Bins: 800
+=> elasped combinationsList: 0.0228190422058 s
+=> elasped findCircles: 3.95943689346 s
+=> elasped extractCenter: 0.02903008461 s
+=> elasped extractRadius: 7.20024108887e-05 s
+Total Runtime: 4.01135802269 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.0269360542297 s
+=> elasped findCircles: 3.49273109436 s
+=> elasped extractCenter: 0.0313799381256 s
+=> elasped extractRadius: 4.31537628174e-05 s
+Total Runtime: 3.55109024048 s
+#############
+Number of Bins: 1400
+=> elasped combinationsList: 0.0256559848785 s
+=> elasped findCircles: 3.58521199226 s
+=> elasped extractCenter: 0.068302154541 s
+=> elasped extractRadius: 4.88758087158e-05 s
+Total Runtime: 3.67921900749 s
+#############
+Number of Bins: 1800
+=> elasped combinationsList: 0.0205969810486 s
+=> elasped findCircles: 3.81466007233 s
+=> elasped extractCenter: 0.108674049377 s
+=> elasped extractRadius: 4.79221343994e-05 s
+Total Runtime: 3.94397902489 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.0263199806213 s
+=> elasped findCircles: 3.82439208031 s
+=> elasped extractCenter: 0.119050979614 s
+=> elasped extractRadius: 0.000146150588989 s
+Total Runtime: 3.96990919113 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.0014488697052 s
+=> elasped findCircles: 0.517112016678 s
+=> elasped extractCenter: 0.0930380821228 s
+=> elasped extractRadius: 4.10079956055e-05 s
+Total Runtime: 0.611639976501 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.00145888328552 s
+=> elasped findCircles: 0.544828176498 s
+=> elasped extractCenter: 0.0931930541992 s
+=> elasped extractRadius: 4.19616699219e-05 s
+Total Runtime: 0.639522075653 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.0277638435364 s
+=> elasped findCircles: 3.25144195557 s
+=> elasped extractCenter: 0.0969018936157 s
+=> elasped extractRadius: 4.29153442383e-05 s
+Total Runtime: 3.37615060806 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.0618710517883 s
+=> elasped findCircles: 3.27465701103 s
+=> elasped extractCenter: 0.0961248874664 s
+=> elasped extractRadius: 4.29153442383e-05 s
+Total Runtime: 3.43269586563 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.0277400016785 s
+=> elasped findCircles: 3.29302692413 s
+=> elasped extractCenter: 0.0962469577789 s
+=> elasped extractRadius: 4.98294830322e-05 s
+Total Runtime: 3.41706371307 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.00132393836975 s
+=> elasped findCircles: 0.430110931396 s
+=> elasped extractCenter: 0.0974929332733 s
+=> elasped extractRadius: 4.79221343994e-05 s
+Total Runtime: 0.528975725174 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.001296043396 s
+=> elasped findCircles: 0.468152999878 s
+=> elasped extractCenter: 0.095449924469 s
+=> elasped extractRadius: 5.10215759277e-05 s
+Total Runtime: 0.564949989319 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.00132298469543 s
+=> elasped findCircles: 0.453927993774 s
+=> elasped extractCenter: 0.0954828262329 s
+=> elasped extractRadius: 5.19752502441e-05 s
+Total Runtime: 0.550785779953 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.000846147537231 s
+=> elasped findCircles: 0.269752025604 s
+=> elasped extractCenter: 0.0935459136963 s
+=> elasped extractRadius: 4.19616699219e-05 s
+Total Runtime: 0.364186048508 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.000847816467285 s
+=> elasped findCircles: 0.262634038925 s
+=> elasped extractCenter: 0.0217700004578 s
+=> elasped extractRadius: 4.50611114502e-05 s
+Total Runtime: 0.285296916962 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.000849008560181 s
+=> elasped findCircles: 0.259615898132 s
+=> elasped extractCenter: 0.0225629806519 s
+=> elasped extractRadius: 4.00543212891e-05 s
+Total Runtime: 0.283067941666 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.000291109085083 s
+=> elasped findCircles: 0.128095149994 s
+=> elasped extractCenter: 0.0228719711304 s
+=> elasped extractRadius: 4.2200088501e-05 s
+Total Runtime: 0.151300430298 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.000289916992188 s
+=> elasped findCircles: 0.110736131668 s
+=> elasped extractCenter: 0.0244510173798 s
+=> elasped extractRadius: 4.50611114502e-05 s
+Total Runtime: 0.135522127151 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.000296115875244 s
+=> elasped findCircles: 0.104928016663 s
+=> elasped extractCenter: 0.0209529399872 s
+=> elasped extractRadius: 4.38690185547e-05 s
+Total Runtime: 0.126220941544 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.000327110290527 s
+=> elasped findCircles: 0.132333040237 s
+=> elasped extractCenter: 0.0225348472595 s
+=> elasped extractRadius: 6.19888305664e-05 s
+Total Runtime: 0.155256986618 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.000818014144897 s
+=> elasped findCircles: 0.254649877548 s
+=> elasped extractCenter: 0.0223071575165 s
+=> elasped extractRadius: 4.19616699219e-05 s
+Total Runtime: 0.27781701088 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.000875949859619 s
+=> elasped findCircles: 0.248777866364 s
+=> elasped extractCenter: 0.000494956970215 s
+=> elasped extractRadius: 2.50339508057e-05 s
+Total Runtime: 0.250173807144 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.000869035720825 s
+=> elasped findCircles: 0.253149032593 s
+=> elasped extractCenter: 0.000638961791992 s
+=> elasped extractRadius: 2.59876251221e-05 s
+Total Runtime: 0.254683017731 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0243499279022 s
+=> elasped findCircles: 0.273844957352 s
+=> elasped extractCenter: 0.000414848327637 s
+=> elasped extractRadius: 2.50339508057e-05 s
+Total Runtime: 0.298634767532 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0251460075378 s
+=> elasped findCircles: 0.257920980453 s
+=> elasped extractCenter: 0.00039005279541 s
+=> elasped extractRadius: 2.59876251221e-05 s
+Total Runtime: 0.283483028412 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0239808559418 s
+=> elasped findCircles: 0.252281188965 s
+=> elasped extractCenter: 0.00041389465332 s
+=> elasped extractRadius: 2.88486480713e-05 s
+Total Runtime: 0.276704788208 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0240149497986 s
+=> elasped findCircles: 0.273564100266 s
+=> elasped extractCenter: 0.000419139862061 s
+=> elasped extractRadius: 2.50339508057e-05 s
+Total Runtime: 0.298023223877 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0247030258179 s
+=> elasped findCircles: 0.252092838287 s
+=> elasped extractCenter: 0.000411987304688 s
+=> elasped extractRadius: 2.50339508057e-05 s
+Total Runtime: 0.277232885361 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0241589546204 s
+=> elasped findCircles: 0.249616861343 s
+=> elasped extractCenter: 0.000380039215088 s
+=> elasped extractRadius: 2.40802764893e-05 s
+Total Runtime: 0.274179935455 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0237679481506 s
+=> elasped findCircles: 0.25291800499 s
+=> elasped extractCenter: 0.000388145446777 s
+=> elasped extractRadius: 2.59876251221e-05 s
+Total Runtime: 0.277100086212 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0238599777222 s
+=> elasped findCircles: 0.256536006927 s
+=> elasped extractCenter: 0.000389099121094 s
+=> elasped extractRadius: 2.59876251221e-05 s
+Total Runtime: 0.280811071396 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0260939598083 s
+=> elasped findCircles: 0.255490064621 s
+=> elasped extractCenter: 0.000410079956055 s
+=> elasped extractRadius: 2.50339508057e-05 s
+Total Runtime: 0.282019138336 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0241641998291 s
+=> elasped findCircles: 0.268784046173 s
+=> elasped extractCenter: 0.000391006469727 s
+=> elasped extractRadius: 2.8133392334e-05 s
+Total Runtime: 0.293367385864 s
+#############
+Number of Bins: 200
+=> elasped combinationsList: 0.0237770080566 s
+=> elasped findCircles: 0.250328063965 s
+=> elasped extractCenter: 0.000393867492676 s
+=> elasped extractRadius: 2.50339508057e-05 s
+Total Runtime: 0.274523973465 s
+#############
+Number of Bins: 2000
+=> elasped combinationsList: 0.0239999294281 s
+=> elasped findCircles: 0.285038948059 s
+=> elasped extractCenter: 0.0951859951019 s
+=> elasped extractRadius: 4.60147857666e-05 s
+Total Runtime: 0.404270887375 s
+#############
+Number of Bins: 1000
+=> elasped combinationsList: 0.0419049263 s
+=> elasped findCircles: 0.312226057053 s
+=> elasped extractCenter: 0.0728359222412 s
+=> elasped extractRadius: 4.60147857666e-05 s
+Total Runtime: 0.42701292038 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.00131511688232 s
+=> elasped findCircles: 0.439302921295 s
+=> elasped extractCenter: 0.223719835281 s
+=> elasped extractRadius: 7.5101852417e-05 s
+Total Runtime: 0.664412975311 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.000862121582031 s
+=> elasped findCircles: 0.27919793129 s
+=> elasped extractCenter: 0.0929298400879 s
+=> elasped extractRadius: 3.60012054443e-05 s
+Total Runtime: 0.373025894165 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.000869035720825 s
+=> elasped findCircles: 0.275171041489 s
+=> elasped extractCenter: 0.0946080684662 s
+=> elasped extractRadius: 3.69548797607e-05 s
+Total Runtime: 0.370685100555 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.000935077667236 s
+=> elasped findCircles: 0.315791845322 s
+=> elasped extractCenter: 0.107922077179 s
+=> elasped extractRadius: 4.19616699219e-05 s
+Total Runtime: 0.424690961838 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.000895977020264 s
+=> elasped findCircles: 0.295283794403 s
+=> elasped extractCenter: 0.109493970871 s
+=> elasped extractRadius: 4.50611114502e-05 s
+Total Runtime: 0.405718803406 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.00184178352356 s
+=> elasped findCircles: 0.31774687767 s
+=> elasped extractCenter: 0.10795211792 s
+=> elasped extractRadius: 6.19888305664e-05 s
+Total Runtime: 0.427602767944 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.000895023345947 s
+=> elasped findCircles: 0.311218976974 s
+=> elasped extractCenter: 0.107309103012 s
+=> elasped extractRadius: 4.50611114502e-05 s
+Total Runtime: 0.419468164444 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.173677921295 s
+=> elasped findCircles: 11.6374168396 s
+=> elasped extractCenter: 0.0872139930725 s
+=> elasped extractRadius: 3.60012054443e-05 s
+Total Runtime: 11.8983447552 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.177386045456 s
+=> elasped findCircles: 11.5828220844 s
+=> elasped extractCenter: 0.108351945877 s
+=> elasped extractRadius: 4.79221343994e-05 s
+Total Runtime: 11.8686079979 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.178304195404 s
+=> elasped findCircles: 13.8786008358 s
+=> elasped extractCenter: 0.106739044189 s
+=> elasped extractRadius: 4.98294830322e-05 s
+Total Runtime: 14.1636939049 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.179533004761 s
+=> elasped findCircles: 13.778042078 s
+=> elasped extractCenter: 0.107365846634 s
+=> elasped extractRadius: 4.60147857666e-05 s
+Total Runtime: 14.0649869442 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 9.70363616943e-05 s
+=> elasped findCircles: 0.0538091659546 s
+=> elasped extractCenter: 0.106934070587 s
+=> elasped extractRadius: 4.10079956055e-05 s
+Total Runtime: 0.160881280899 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.000488042831421 s
+=> elasped findCircles: 0.232290029526 s
+=> elasped extractCenter: 0.106066942215 s
+=> elasped extractRadius: 4.19616699219e-05 s
+Total Runtime: 0.338886976242 s
+#############
+Number of space bins: 2000
+Number of radius bins: 1000
+=> elasped combinationsList: 0.0864219665527 s
+=> elasped findCircles: 7.20171999931 s
+=> elasped extractCenter: 0.108932971954 s
+=> elasped extractRadius: 4.6968460083e-05 s
+Total Runtime: 7.39712190628 s
+#############
+Number of space bins: 2000
+Number of radius bins: 100
+=> elasped combinationsList: 0.0862109661102 s
+=> elasped findCircles: 7.28103089333 s
+=> elasped extractCenter: 0.110392093658 s
+=> elasped extractRadius: 4.2200088501e-05 s
+Total Runtime: 7.47767615318 s
+#############
+Number of space bins: 2000
+Number of radius bins: 100
+=> elasped combinationsList: 0.0917270183563 s
+=> elasped findCircles: 7.17052793503 s
+=> elasped extractCenter: 0.113555908203 s
+=> elasped extractRadius: 3.40938568115e-05 s
+Total Runtime: 7.37584495544 s
+#############
+Number of space bins: 2000
+Number of radius bins: 100
+=> elasped combinationsList: 0.174163103104 s
+=> elasped findCircles: 12.4074149132 s
+=> elasped extractCenter: 0.106491088867 s
+=> elasped extractRadius: 4.10079956055e-05 s
+Total Runtime: 12.6881101131 s
+#############

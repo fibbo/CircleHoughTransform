@@ -16,7 +16,7 @@ def HoughTransform( data ):
   histograms = createHistograms( data )
   radiuses = findRadiusClusters( histograms )
   plt.scatter( data['x'], data['y'] )
-
+  # import pdb; pdb.set_trace()
   fig = plt.gcf()
   for radius in radiuses:
     if not radius['Radius']:
@@ -25,10 +25,12 @@ def HoughTransform( data ):
     for i in radius['Radius']:
       circle = plt.Circle( radius['Center'], i, fill = False )
       fig.gca().add_artist( circle )
-
-  fig.gca().add_artist( plt.Circle( ( -0.342, -0.994 ), 0.719, fill = False, color = 'red' ) )
-  fig.gca().add_artist( plt.Circle( ( -0.821, -0.656 ), 0.563, fill = False, color = 'green' ) )
-  fig.gca().add_artist( plt.Circle( ( -0.261, -0.328 ), 0.892, fill = False, color = 'blue' ) )
+  colors = ['red', 'green', 'blue', 'yellow']
+  i = 0
+  for center, radius in zip(data['Center'], data['Radius']):
+    fig.gca().add_artist( plt.Circle( center, radius, fill = False, color = colors[i] ) )
+    i+=1
+  
   plt.show()
 
 def findRadiusClusters( histograms ):
@@ -241,8 +243,8 @@ if __name__ == '__main__':
     print "(%s, %s) - %s" % ( c1, c2, colors[i] )
     i += 1
   # print data['GridSum']
-  visualize( data )
-
+  #visualize( data )
+  HoughTransform(data)
   print 'The End'
 
 
