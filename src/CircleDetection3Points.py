@@ -7,11 +7,12 @@ from Tools import readFile2
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import sys
+import pdb
 import itertools
 import numpy as np
 from timer import Timer
 
-NUMBER_OF_R_BINS = 100 #bins for radius
+NUMBER_OF_R_BINS = 800 #bins for radius
 NUMBER_OF_S_BINS = 2000 #bins for space
 
 def findCircles( combinationsList ):
@@ -41,7 +42,7 @@ def findCircles( combinationsList ):
     s = ( a + b + c ) / 2
 
     R = a * b * c / 4 / np.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) )
-    if R <= 1.:
+    if True:
       b1 = a ** 2 * ( b ** 2 + c ** 2 - a ** 2 )
       b2 = b ** 2 * ( a ** 2 + c ** 2 - b ** 2 )
       b3 = c ** 2 * ( a ** 2 + b ** 2 - c ** 2 )
@@ -52,7 +53,7 @@ def findCircles( combinationsList ):
       r.append( R )
   
   center_histogram, c_xedges, c_yedges = np.histogram2d( x, y, NUMBER_OF_S_BINS, [[-1, 1], [-1, 1]] )
-  radius_histogram, r_xedges = np.histogram( r, NUMBER_OF_R_BINS, [0, 1], normed=True )
+  radius_histogram, r_xedges = np.histogram( r, NUMBER_OF_R_BINS, [0, 2], normed=False )
   center = {}
   center['H'] = center_histogram
   center['xedges'] = c_xedges
@@ -88,7 +89,7 @@ def extractCenter( center ):
     index = np.argmax(H)
     xmax, ymax = np.unravel_index( index, (NUMBER_OF_S_BINS, NUMBER_OF_S_BINS) )
     centers.append((xedges[xmax], yedges[ymax]))
-    H[xmax][ymax] = 0
+    #H[xmax][ymax] = 0
 
   return centers
 
@@ -108,7 +109,7 @@ def extractRadius( radius ):
     index = np.argmax(H)
     xmax = np.unravel_index( index, NUMBER_OF_R_BINS )
     radiuses.append(edges[xmax])
-    H[xmax] = 0
+    #H[xmax] = 0
   return radiuses
 
 def visualizeCenterHistogram( center ):
@@ -122,8 +123,8 @@ def visualizeCenterHistogram( center ):
   
   
 def visualizeRadiusHistogram( radius ):
-  step = 1./NUMBER_OF_R_BINS
-  edges = np.arange(0,1,step)
+  step = 2./NUMBER_OF_R_BINS
+  edges = np.arange(0,2,step)
   H = radius['H']
   plt.bar(edges,H, width=step)
   plt.xlim(min(edges), max(edges))

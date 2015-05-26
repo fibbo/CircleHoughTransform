@@ -60,8 +60,8 @@ def readFile2( filename ):
         allPoints.append( np.array( [float( sep[1] ), float( sep[2] ) ] ) )
     if 'Center' in line:
       sep = line.split()
-      tmp = literal_eval( sep[8] )
-      center.append( tmp )
+      #tmp = literal_eval( sep[8] )
+      #center.append( tmp )
 
     if 'Radius' in line:
       sep = line.split()

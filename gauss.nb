@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     17242,        422]
-NotebookOptionsPosition[     16577,        396]
-NotebookOutlinePosition[     16915,        411]
-CellTagsIndexPosition[     16872,        408]
+NotebookDataLength[     17741,        441]
+NotebookOptionsPosition[     16965,        411]
+NotebookOutlinePosition[     17303,        426]
+CellTagsIndexPosition[     17260,        423]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -392,7 +392,22 @@ Cell[BoxData[{
     RowBox[{"2", " ", 
      RowBox[{"(", 
       RowBox[{"y2", "-", "y3"}], ")"}]}]]}], ";"}]}], "Input",
- CellChangeTimes->{{3.639211699238557*^9, 3.6392117630576277`*^9}}]
+ CellChangeTimes->{{3.639211699238557*^9, 3.6392117630576277`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"Binomial", "[", 
+    RowBox[{"95", ",", "3"}], "]"}], "-", 
+   RowBox[{"Binomial", "[", 
+    RowBox[{"80", ",", "3"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.64163158690866*^9, 3.641631600563897*^9}}],
+
+Cell[BoxData["56255"], "Output",
+ CellChangeTimes->{3.641631601381639*^9}]
+}, Open  ]]
 },
 WindowSize->{808, 911},
 WindowMargins->{{870, Automatic}, {Automatic, 24}},
@@ -423,7 +438,11 @@ Cell[12712, 275, 1293, 39, 55, "Input"],
 Cell[14008, 316, 533, 15, 59, "Output"],
 Cell[14544, 333, 554, 16, 59, "Output"]
 }, Open  ]],
-Cell[15113, 352, 1460, 42, 251, "Input"]
+Cell[15113, 352, 1460, 42, 251, "Input"],
+Cell[CellGroupData[{
+Cell[16598, 398, 274, 7, 55, "Input"],
+Cell[16875, 407, 74, 1, 65, "Output"]
+}, Open  ]]
 }
 ]
 *)
