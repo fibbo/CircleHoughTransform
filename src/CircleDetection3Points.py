@@ -12,8 +12,8 @@ import itertools
 import numpy as np
 from timer import Timer
 
-NUMBER_OF_R_BINS = 800 #bins for radius
-NUMBER_OF_S_BINS = 2000 #bins for space
+NUMBER_OF_R_BINS = 200 #bins for radius
+NUMBER_OF_S_BINS = 100 #bins for space
 
 def findCircles( combinationsList ):
   """ With the help of barycentric coordinates we calculate the radius and the center defined by each tuple of 3 points given as parameter
@@ -64,6 +64,19 @@ def findCircles( combinationsList ):
 
   return center, radius
 
+def backgroundHistogram( filename ):
+  """ Creates a histogram for both radius and center for a given filename. It is used for creating background histograms so we can minimize
+      false hits from background and mismatched 3tuples (2 points of one circle and one of another e.g.)
+
+      :param filename: path to the source text file with the background points
+      :returns center dict and radius dict.
+
+  """
+  data = readFile2( filename )
+  combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+  center, radius = findCircles( combinationsList )
+  return center, radius
+  
 def extractCenter( center ):
   """ Simple method to find possible circle centers. Find highest entry in histogram save the value and set bin to 0 so we can look for the next.
       we do this <x> times.
@@ -122,10 +135,13 @@ def visualizeCenterHistogram( center ):
   plt.show()
   
   
-def visualizeRadiusHistogram( radius ):
+def visualizeRadiusHistogram( radius, backgroundHistogram=None ):
   step = 2./NUMBER_OF_R_BINS
   edges = np.arange(0,2,step)
   H = radius['H']
+  pdb.set_trace()
+  if not type(backgroundHistogram) == type(None):
+    H = H-backgroundHistogram['H']
   plt.bar(edges,H, width=step)
   plt.xlim(min(edges), max(edges))
   
@@ -137,34 +153,42 @@ if __name__ == '__main__':
     sys.exit( 'Please provide file to be read' )
   path = sys.argv[1]
   data = readFile2( path )
-  with open( 'runtimes.txt', 'a' ) as f:
-    f.write("Number of space bins: %s\n" % NUMBER_OF_S_BINS)
-    f.write("Number of radius bins: %s\n" % NUMBER_OF_R_BINS)
-    totalRuntime = 0
-    with Timer() as t:
-      combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
-    f.write("=> elasped combinationsList: %s s\n" % t.secs)
-    totalRuntime += t.secs
+  timed = False
+  if timed:
+    with open( 'runtimes.txt', 'a' ) as f:
+      f.write("Number of space bins: %s\n" % NUMBER_OF_S_BINS)
+      f.write("Number of radius bins: %s\n" % NUMBER_OF_R_BINS)
+      totalRuntime = 0
+      with Timer() as t:
+        combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+      f.write("=> elasped combinationsList: %s s\n" % t.secs)
+      totalRuntime += t.secs
 
-    with Timer() as t:
-      center, radius = findCircles( combinationsList )
-    f.write("=> elasped findCircles: %s s\n" % t.secs)
-    totalRuntime += t.secs
+      with Timer() as t:
+        center, radius = findCircles( combinationsList )
+      f.write("=> elasped findCircles: %s s\n" % t.secs)
+      totalRuntime += t.secs
 
-    with Timer() as t:
-      centers = extractCenter(center)
-    f.write("=> elasped extractCenter: %s s\n" % t.secs)
-    totalRuntime += t.secs
+      with Timer() as t:
+        centers = extractCenter(center)
+      f.write("=> elasped extractCenter: %s s\n" % t.secs)
+      totalRuntime += t.secs
 
-    with Timer() as t:
-      radiuses = extractRadius(radius)
-    f.write("=> elasped extractRadius: %s s\n" % t.secs)
-    totalRuntime += t.secs
-    f.write("Total Runtime: %s s\n" % totalRuntime)
-    f.write("#############\n")
-  f.close()
-  print centers
-  print radiuses
-  visualizeRadiusHistogram(radius)
+      with Timer() as t:
+        radiuses = extractRadius(radius)
+      f.write("=> elasped extractRadius: %s s\n" % t.secs)
+      totalRuntime += t.secs
+      f.write("Total Runtime: %s s\n" % totalRuntime)
+      f.write("#############\n")
+    f.close()
 
+  else:
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    center, radius = findCircles( combinationsList )
+    centers = extractCenter(center)
+    centerBackground, radiusBackground = backgroundHistogram( '../data/0_circles_45_bg.txt')
+  # print centers
+  # print radiuses
+  visualizeRadiusHistogram(radius, radiusBackground)
+  visualizeRadiusHistogram(radiusBackground)
   visualizeCenterHistogram(center)
