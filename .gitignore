@@ -228,3 +228,12 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+
+#LaTeX
+
+*.aux
+*.fdb*
+*.pdf
+*.sync*
+*.toc
