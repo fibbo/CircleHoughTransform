@@ -71,3 +71,13 @@ def readFile2( filename ):
       nPoints.append( float( sep[3] ) )
 
   return { 'allPoints' : allPoints, 'Center' : center, 'Radius' : radius, 'nPoints' : nPoints }
+
+
+def S_ERROR( messageString = '' ):
+  """ return value on error confition
+  :param string messageString: error description
+  """
+  return { 'OK' : False, 'Message' : str( messageString )  }
+
+def S_OK( value = None ):
+  return { 'OK' : True, 'Value' : value }

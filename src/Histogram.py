@@ -1,62 +1,7 @@
 from math import ceil
 import numpy as np
 import pdb
-
-
-def PHistogram(data, number_of_bins, hrange=None, position=None):
-  """ Creates a histogram for a given with number_of_bins entries within the boundaries given by range. 
-      The important thing is that in addition to the histogram we also create an array that stores
-      the single data objects that were filled in the histogram in the same bin they have been place
-      in the histogram. So if we have data that corresponds in some way and we don't want to lose the
-      correlation we can still find out, which data objects are placed in a bin and do further analysis.
-      For example consider data of the form 
-      data[0] = list of different radiuses
-      data[1] = list of (x,y) tuples
-      So we create a histogram for data[0]
-      To choose from which data set we want to form a histogram we specify position. So position=0
-      creates a histogram for the list of radiuses.
-  """
-  dtype = [('radius', float), ('center', tuple)]
-
-  sa = np.array(data, dtype=dtype)
-  if (hrange is not None):
-    mn, mx = hrange
-    if mn > mx:
-      raise AttributeError('max must be larger than min')
-  
-  data_array = [list() for _ in range(number_of_bins)]
-  bins = np.linspace(mn, mx, number_of_bins+1)
-  n = np.zeros(number_of_bins, int)
-  block = 65536
-
-  for i in np.arange(0, len(sa), block):
-    # sort the array for radius
-    sa = np.sort(sa[i:i+block], order='radius')
-
-    # split radius and center data
-    a,b = zip(*sa)
-
-    # convert radius object to array and center object to list
-    a = np.asarray(a)
-    b = list(b)
-
-    # intermediate calculation of the histogram VW used to add center entries to their
-    # respective bins
-    VW = np.r_[a.searchsorted(bins[:-1], 'left'), a.searchsorted(bins[-1], 'right')]
-    VW = np.diff(VW)
-    n += VW
-    j = 0
-    for i in VW:
-      if i > 0:
-        index = i
-      else:
-        j+=1
-        continue
-      data_array[j].append(b[:index])
-      j+=1
-      b = b[index:]
-
-  return n, bins, data_array
+from Tools import readFile2
 
 class Histogram():
   def __init__(self, bin_width, min_value, max_value, center):
