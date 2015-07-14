@@ -11,7 +11,7 @@ import itertools
 import numpy as np
 from timer import Timer
 
-NUMBER_OF_R_BINS = 400 #bins for radius
+NUMBER_OF_R_BINS = 200 #bins for radius
 NUMBER_OF_S_BINS = 1000 #bins for space
 VISUALISATION = True
 
@@ -21,10 +21,7 @@ def SHistogram(data, number_of_bins, hrange=None):
       the single data objects that were filled in the histogram in the same bin they have been place
       in the histogram. So if we have data that corresponds in some way and we don't want to lose the
       correlation we can still find out, which data objects are placed in a bin and do further analysis.
-      For example consider data of the form 
-      data[0] = list of different radiuses
-      data[1] = list of (x,y) tuples
-      So we create a histogram for data[0]
+
       To choose from which data set we want to form a histogram we specify position. So position=0
       creates a histogram for the list of radiuses.
 
@@ -121,7 +118,9 @@ def main( combinationsList ):
                              - xedges of the histogram
 
   """
+
   xy, r = calculateCircleFromPoints( combinationsList )
+  fullCenterHistogram( xy )
   data = zip(r, xy)
   dtype = [('radius', float), ('center', tuple)]
   data = np.array(data,dtype=dtype)
@@ -132,17 +131,17 @@ def main( combinationsList ):
   radius_histogram, bins,  center_data = res['Value']
 
   # create a background histogram
-  bkgHistogram, edges = backgroundHistogram('../data/left_to_right/2_0_circles_25_bg.txt')
+  bkgHistogram, edges = backgroundHistogram('../data/left_to_right/2_0_circles_30_bg.txt')
 
 
   radius = {}
-  radius['H'] = radius_histogram - bkgHistogram
+  radius['H'] = radius_histogram #- bkgHistogram
   radius['xedges'] = edges
   radius['center_data'] = center_data
 
   visualizeRadiusHistogram(radius)
 
-  radiuses,center_data = extractRadius(radius)
+  radiuses, center_data = extractRadius(radius)
 
   # check for each radius if we have a peak in center_data
 
@@ -173,7 +172,7 @@ def backgroundHistogram( filename ):
   return bkgHistogram, edges
   
   
-def extractCenter( center_dict, guessed_circles = 1 ):
+def extractCenter( center_dict ):
   """ Simple method to find possible circle centers. Find highest entry in histogram save the value and set bin to 0 so we can look for the next.
       we do this <x> times.
 
@@ -186,6 +185,9 @@ def extractCenter( center_dict, guessed_circles = 1 ):
   
   xedges = center_dict['xedges']
   yedges = center_dict['yedges']
+  centers = []
+
+  n = NUMBER_OF_S_BINS
 
   #TODO: to be able to set a mask to set values around the maximum index to 0
   # for example
@@ -194,24 +196,31 @@ def extractCenter( center_dict, guessed_circles = 1 ):
   #                          000
   #
   # so x is the maximum we found and we want to set adjacent values to 0 as well
+  while True:
+    index = np.argmax(H)
+    i, j = np.unravel_index( index, (NUMBER_OF_S_BINS, NUMBER_OF_S_BINS) )
+    n_entries =   sum(sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j-1 if j>0 else j:j+2 if j<n else j+1]))
 
-  index = np.argmax(H)
-  i, j = np.unravel_index( index, (NUMBER_OF_S_BINS, NUMBER_OF_S_BINS) )
-  n = NUMBER_OF_S_BINS
-  n_entries =   sum(sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j-1 if j>0 else j:j+2 if j<n else j+1]))
-  for entry in H[i-1 if i>0 else i:i+2 if i<n else i+1,j-1 if j>0 else j:j+2 if j<n else j+1]):
-    entry = 0
-  center = (xedges[xmax], yedges[ymax])
+    if n_entries < 30:
+      break
 
-  return center
+    # Set the entries to 0 so they won't contribute twice
+    i_index = range(i-1 if i>0 else i,i+2 if i<n else i+1)
+    j_index = range(j-1 if j>0 else j,j+2 if j<n else j+1)
+    for i in i_index:
+      for j in j_index:
+        H[i][j] = 0
+    
+    centers.append( (xedges[i], yedges[j]) )
+
+  return centers
 
 def extractRadius( radius_dict ):
   """ Simple method to find possible radiuses. Find highest entry in histogram, save the value and set bin to 0 and then look for the next.
 
 
       :param dict radius: radius dicitonary with 'H' histogram, 'xedges' and 'yedges'
-      :returns list radius: a list with possible radiuses
-
+      :returns radius, center_data
   """
   radiuses = []
   center_data = []
@@ -220,15 +229,17 @@ def extractRadius( radius_dict ):
   center = radius_dict['center_data']
   while True:
     i = np.argmax(H)
-    n_entries = H[i-1 if i>0 else i:i+2 if i<n else i+1]
-    if n_entries < 60:
-      # there are less than 60 entries in 3 bins
+    n = NUMBER_OF_R_BINS
+    n_entries = sum(H[i-1 if i>0 else i:i+2 if i<n else i+1])
+    if n_entries < 200:
+      # there are less than 200 entries in 3 bins
       break
 
-    n_circles = ceil(n_entries/455)
-    radiuses.append(edges[index])
-    center_data.append(center[index])
-    H[index] = 0
+    radiuses.append(edges[i])
+    center_data.append(center[i])
+    index_list = range(i-1 if i>0 else i,i+2 if i<n else i+ 1)
+    for index in index_list:
+      H[index] = 0
   return radiuses, center_data 
 
 def visualizeCenterHistogram( x,y ):
@@ -258,41 +269,13 @@ if __name__ == '__main__':
   path = sys.argv[1]
   data = readFile( path )
   timed = False
-  if timed:
-    with open( 'runtimes.txt', 'a' ) as f:
-      f.write("Number of space bins: %s\n" % NUMBER_OF_S_BINS)
-      f.write("Number of radius bins: %s\n" % NUMBER_OF_R_BINS)
-      totalRuntime = 0
-      with Timer() as t:
-        combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
-      f.write("=> elasped combinationsList: %s s\n" % t.secs)
-      totalRuntime += t.secs
-
-      with Timer() as t:
-        center, radius = findCircles( combinationsList )
-      f.write("=> elasped findCircles: %s s\n" % t.secs)
-      totalRuntime += t.secs
-
-      with Timer() as t:
-        centers = extractCenter(center)
-      f.write("=> elasped extractCenter: %s s\n" % t.secs)
-      totalRuntime += t.secs
-
-      with Timer() as t:
-        radiuses = extractRadius(radius)
-      f.write("=> elasped extractRadius: %s s\n" % t.secs)
-      totalRuntime += t.secs
-      f.write("Total Runtime: %s s\n" % totalRuntime)
-      f.write("#############\n")
-    f.close()
-
+  import pdb; pdb.set_trace()
+  combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+  res = main( combinationsList )
+  if not res['OK']:
+    print res['Message']
   else:
-    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
-    res = main( combinationsList )
-    if not res['OK']:
-      print res['Message']
-    else:
-      print 'Done'
+    print 'Done'
   
     
 
