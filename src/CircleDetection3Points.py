@@ -5,7 +5,6 @@ Created on Apr 29, 2015
 '''
 from Tools import readFile, S_ERROR, S_OK
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import sys
 import itertools
 import numpy as np
