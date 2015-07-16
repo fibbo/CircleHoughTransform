@@ -1,8 +1,10 @@
 import unittest
 
 from Tools import readFile
-from CircleDetection3Points import SHistogram, extractRadius, calculateCircleFromPoints
+from CircleDetection3Points import SHistogram, extractRadius, calculateCircleFromPoints, mt_calculateCircleFromPoints
 import numpy as np
+from Queue import Queue
+import threading
 import itertools
 
 class ToolsTest( unittest.TestCase ):
@@ -37,9 +39,23 @@ class ToolsTest( unittest.TestCase ):
     for radius, center in zip(radiuses, centers):
       print radius, center
 
-  def testcalcPoints( self ):
+  def tstcalcPoints( self ):
     res = calculateCircleFromPoints( self.combinationsList )
     print res
+
+  def xtestCombListMT( self ):
+    data = readFile( '../data/lhcb_data/Event00002346.txt' )
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    q = Queue()
+    for points in combinationsList:
+      t = threading.Thread(target=mt_calculateCircleFromPoints, args = (q,points))
+      t.daemon = True
+      t.start()
+
+  def testCombListST( self ):
+    data = readFile( '../data/lhcb_data/Event00001486.txt' )
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    xy, r = calculateCircleFromPoints( combinationsList )
 
 if __name__ == '__main__':
   suite = unittest.defaultTestLoader.loadTestsFromTestCase( ToolsTest )
