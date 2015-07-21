@@ -3,17 +3,24 @@ Created on Apr 29, 2015
 
 @author: phi
 '''
-from Tools import readFile, S_ERROR, S_OK
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import sys
 import itertools
+import pdb
+
+
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+
+from Tools import readFile, S_ERROR, S_OK
 from timer import Timer
+
+
 
 NUMBER_OF_R_BINS = 200 #bins for radius
 NUMBER_OF_S_BINS = 1000 #bins for space
-VISUALISATION = True
+VISUALISATION = False
 
 def SHistogram(data, number_of_bins, hrange=None):
   """ Creates a histogram for a given with number_of_bins entries within the boundaries given by range. 
@@ -67,7 +74,10 @@ def SHistogram(data, number_of_bins, hrange=None):
   return S_OK( (n, bins, data_array) )
 
 
-def calculateCircleFromPoints(combinationsList):
+def calculateCircleFromPoints(combinationsList, onlyRadius=False):
+  """ Calculate the circle from 3 given points. 
+
+  """
   r = []
   xy = []
 
@@ -84,16 +94,18 @@ def calculateCircleFromPoints(combinationsList):
     s = ( a + b + c ) / 2
 
     R = a * b * c / 4 / np.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) )
-    #R = round(R, 4)
-    #print R
-    if R<3:
-      lambda1 = a2 * ( b2 + c2 - a2 )
-      lambda2 = b2 * ( a2 + c2 - b2 )
-      lambda3 = c2 * ( a2 + b2 - c2 )
-      P = np.column_stack( ( A, B, C ) ).dot( np.hstack( ( lambda1, lambda2, lambda3 ) ) )
-      P /= lambda1 + lambda2 + lambda3
-      xy.append( (P[0],P[1]) )
-      r.append(R)
+    
+    if R<1:
+      if onlyRadius:
+        r.append(R)
+      else: 
+        lambda1 = a2 * ( b2 + c2 - a2 )
+        lambda2 = b2 * ( a2 + c2 - b2 )
+        lambda3 = c2 * ( a2 + b2 - c2 )
+        P = np.column_stack( ( A, B, C ) ).dot( np.hstack( ( lambda1, lambda2, lambda3 ) ) )
+        P /= lambda1 + lambda2 + lambda3
+        xy.append( (P[0],P[1]) )
+        r.append(R)
 
   return xy, r
 
@@ -120,7 +132,7 @@ def main( combinationsList ):
   """
 
   xy, r = calculateCircleFromPoints( combinationsList )
-  fullCenterHistogram( xy )
+  #fullCenterHistogram( xy )
   data = zip(r, xy)
   dtype = [('radius', float), ('center', tuple)]
   data = np.array(data,dtype=dtype)
@@ -128,10 +140,10 @@ def main( combinationsList ):
   if not res['OK']:
     return S_ERROR(res['Message'])
   
-  radius_histogram, bins,  center_data = res['Value']
+  radius_histogram, edges,  center_data = res['Value']
 
   # create a background histogram
-  bkgHistogram, edges = backgroundHistogram('../data/left_to_right/2_0_circles_30_bg.txt')
+  #bkgHistogram, edges = backgroundHistogram('../data/left_to_right/2_0_circles_30_bg.txt')
 
 
   radius = {}
@@ -154,7 +166,8 @@ def main( combinationsList ):
     center_dict['yedges'] = yedges
     visualizeCenterHistogram(x,y)
     circle_center = extractCenter(center_dict)
-    print radius, circle_center
+    if len(circle_center) > 0:
+      print radius, circle_center
   return S_OK()
 
 
@@ -268,14 +281,9 @@ if __name__ == '__main__':
     sys.exit( 'Please provide file to be read' )
   path = sys.argv[1]
   data = readFile( path )
-  timed = False
-  import pdb; pdb.set_trace()
   combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
   res = main( combinationsList )
-  if not res['OK']:
-    print res['Message']
-  else:
-    print 'Done'
+
   
     
 

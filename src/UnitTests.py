@@ -1,11 +1,14 @@
 import unittest
 
 from Tools import readFile
-from CircleDetection3Points import SHistogram, extractRadius, calculateCircleFromPoints, mt_calculateCircleFromPoints
+from CircleDetection3Points import *
 import numpy as np
 from Queue import Queue
 import threading
 import itertools
+import matplotlib.pyplot as plt
+from scipy import special
+
 
 class ToolsTest( unittest.TestCase ):
 
@@ -43,19 +46,82 @@ class ToolsTest( unittest.TestCase ):
     res = calculateCircleFromPoints( self.combinationsList )
     print res
 
-  def xtestCombListMT( self ):
-    data = readFile( '../data/lhcb_data/Event00002346.txt' )
-    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
-    q = Queue()
-    for points in combinationsList:
-      t = threading.Thread(target=mt_calculateCircleFromPoints, args = (q,points))
-      t.daemon = True
-      t.start()
 
-  def testCombListST( self ):
-    data = readFile( '../data/lhcb_data/Event00001486.txt' )
+  def tstCombListST( self ):
+    data = readFile( '../data/lhcb_data/Event00009999.txt' )
     combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
     xy, r = calculateCircleFromPoints( combinationsList )
+    print len(r)
+
+  def tstBackgroundHistogram( self ):
+    data = readFile( '../data/0_circles_200_bg.txt')
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    xy, r1 = calculateCircleFromPoints( combinationsList, onlyRadius=True )
+
+
+    data = readFile( '../data/0_circles_130_bg.txt')
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    xy, r2 = calculateCircleFromPoints( combinationsList, onlyRadius=True )
+
+    data = readFile( '../data/0_circles_150_bg.txt')
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    xy, r3 = calculateCircleFromPoints( combinationsList, onlyRadius=True )
+
+    data = readFile( '../data/0_circles_185_bg.txt')
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    xy, r4 = calculateCircleFromPoints( combinationsList, onlyRadius=True )
+  
+    plt.hist(r1, 200, alpha=0.5, label='200')
+    plt.hist(r2, 200, alpha=0.5, label='130')
+    plt.hist(r3, 200, alpha=0.5, label='150')
+    plt.hist(r4, 200, alpha=0.5, label='185')
+    plt.legend(loc='upper right')
+    plt.show()
+
+  def tstScaling(self):
+    factor = 1.72973
+    data = readFile( '../data/0_circles_500_bg.txt')
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    xy, r2 = calculateCircleFromPoints( combinationsList, onlyRadius=True )
+    h2, edges = np.histogram( r2, 100, [0,1])
+    np.savetxt('r2.txt', h2)
+    h2 = factor*h2
+
+    data = readFile( '../data/0_circles_600_bg.txt')
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    xy, r1 = calculateCircleFromPoints( combinationsList, onlyRadius=True )
+    h1, edges = np.histogram( r1, 100, [0,1])
+
+    # plt.hist(r1, 200, alpha=0.5, label='200')
+    # plt.hist(r2, 200, alpha=0.5, label='130')
+    # plt.legend(loc='upper right')
+    # plt.show()
+    step = 1./100
+    edges = np.arange(0,1,step)
+    plt.bar(edges,h1, width=step, alpha = 0.5, label='600')
+    plt.bar(edges,h2, width=step, alpha = 0.5, label='500', color='y')
+    plt.legend(loc='upper right')
+    plt.xlim(min(edges), max(edges))
+    
+    plt.show()
+
+  def testDiffBackground(self):
+    background_hits = range(51)
+    for i in background_hits:
+      path = '../data/1_ring_diff_bg/1_circle_%s_bg.txt' % i
+      data = readFile( path )
+      combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+      print "%s bg hits" % i
+      res = main( combinationsList )
+
+  def tstDiffCircleHits( self ):
+    circle_hits = range(5,30,5)
+    for i in circle_hits:
+      path = '../data/1_ring_diff_hits_const_bg/1_circle_%s_hits_20_bg.txt' % i
+      data = readFile( path )
+      combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+      print "%s circle hits" % i
+      res = main( combinationsList )
 
 if __name__ == '__main__':
   suite = unittest.defaultTestLoader.loadTestsFromTestCase( ToolsTest )
