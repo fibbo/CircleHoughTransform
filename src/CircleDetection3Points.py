@@ -21,7 +21,7 @@ from timer import Timer
 
 NUMBER_OF_R_BINS = 200 #bins for radius
 NUMBER_OF_S_BINS = 1000 #bins for space
-VISUALISATION = False
+VISUALISATION = True
 
 def SHistogram(data, number_of_bins, hrange=None):
   """ Creates a histogram for a given with number_of_bins entries within the boundaries given by range. 
@@ -89,6 +89,9 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
     a = np.linalg.norm( C - B )
     b = np.linalg.norm( C - A )
     c = np.linalg.norm( B - A )
+    max_distance = 0.5
+    if a > max_distance or b > max_distance or c > max_distance:
+      continue
     a2 = a*a
     b2 = b*b
     c2 = c*c
@@ -137,7 +140,7 @@ def main( combinationsList ):
   data = zip(r, xy)
   dtype = [('radius', float), ('center', tuple)]
   data = np.array(data,dtype=dtype)
-  res = SHistogram(data, NUMBER_OF_R_BINS, [0,2])
+  res = SHistogram(data, NUMBER_OF_R_BINS, [0,1])
   if not res['OK']:
     return S_ERROR(res['Message'])
   
@@ -160,12 +163,12 @@ def main( combinationsList ):
 
   for radius, center in zip(radiuses, center_data):
     x,y = zip(*center)
-    H, xedges, yedges = np.histogram2d(x,y,NUMBER_OF_S_BINS,[[-1, 1], [-1, 1]])
+    H, xedges, yedges = np.histogram2d(x,y,NUMBER_OF_S_BINS,[[-0.5, 0.5], [-0.5, 0.5]])
     center_dict = {}
     center_dict['H'] = H
     center_dict['xedges'] = xedges
     center_dict['yedges'] = yedges
-    visualizeCenterHistogram(x,y)
+    #visualizeCenterHistogram(x,y)
     circle_center = extractCenter(center_dict)
     if len(circle_center) > 0:
       print radius, circle_center
@@ -215,7 +218,7 @@ def extractCenter( center_dict ):
     i, j = np.unravel_index( index, (NUMBER_OF_S_BINS, NUMBER_OF_S_BINS) )
     n_entries =   sum(sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j-1 if j>0 else j:j+2 if j<n else j+1]))
 
-    if n_entries < 30:
+    if n_entries < 25:
       break
 
     # Set the entries to 0 so they won't contribute twice
@@ -244,14 +247,14 @@ def extractRadius( radius_dict ):
   while True:
     i = np.argmax(H)
     n = NUMBER_OF_R_BINS
-    n_entries = sum(H[i-1 if i>0 else i:i+2 if i<n else i+1])
-    if n_entries < 200:
+    n_entries = sum(H[i-1 if i>0 else i:i+2 if i<n-1 else i+1])
+    if n_entries < 150:
       # there are less than 200 entries in 3 bins
       break
 
     radiuses.append(edges[i])
     center_data.append(center[i])
-    index_list = range(i-1 if i>0 else i,i+2 if i<n else i+ 1)
+    index_list = range(i-1 if i>0 else i,i+2 if i<n-1 else i+ 1)
     for index in index_list:
       H[index] = 0
   return radiuses, center_data 
@@ -260,7 +263,7 @@ def visualizeCenterHistogram( x,y ):
   if not VISUALISATION:
     pass
   else:
-    H, xedges, yedges, _ = plt.hist2d(x,y,NUMBER_OF_S_BINS, [[-1,1],[-1,1]])
+    H, xedges, yedges, _ = plt.hist2d(x,y,NUMBER_OF_S_BINS, [[-0.5,0.5],[-0.5,0.5]])
     plt.show()
   
   
@@ -268,8 +271,8 @@ def visualizeRadiusHistogram( radius ):
   if not VISUALISATION:
     pass
   else:
-    step = 2./NUMBER_OF_R_BINS
-    edges = np.arange(0,2,step)
+    step = 1./NUMBER_OF_R_BINS
+    edges = np.arange(0,1,step)
     H = radius['H']
     plt.bar(edges,H, width=step)
     plt.xlim(min(edges), max(edges))
