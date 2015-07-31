@@ -8,7 +8,7 @@ import threading
 import itertools
 import matplotlib.pyplot as plt
 from scipy import special
-
+import random
 
 class ToolsTest( unittest.TestCase ):
 
@@ -17,7 +17,9 @@ class ToolsTest( unittest.TestCase ):
 
     self.r = [ 0.3, 0.3, 0.40, 0.40, 0.50, 0.30, 0.3 ]
     self.c = [ (0.,0.), (0.,0.), (0.2,0.3), (0.1,0.5), (0.2,0.3), (0.7,0.), (0., 0.)]
-
+    length = 120000
+    self.r_large = [ random.random() for _ in range(length)]
+    self.c_large = [ (random.random(), random.random()) for _ in range(length)]
     self.points = [ np.array((0.,0.3)), np.array((0.,-0.3)), np.array((0.3,0.)), np.array((-0.3,0.)) ]
     self.combinationsList =   list( itertools.combinations( self.points, 3 ) )
 
@@ -25,22 +27,15 @@ class ToolsTest( unittest.TestCase ):
     res = readFile( self.filename )
     print res
 
-  def tstHistogram( self ):
-    data = zip(self.r, self.c)
+  def testHistogram( self ):
+    data = zip(self.r_large, self.c_large)
     dtype = [('radius', float), ('center', tuple)]
     data = np.array(data,dtype=dtype)
-    res = SHistogram(data, 50, [0,0.5])
+    res = SHistogram(data, 50, [0,1])
     H, bins, center = res['Value']
-    print bins
-    radius = {}
-    radius['H'] = H
-    print H
-    radius['xedges'] = bins
-    radius['center_data'] = center
-    radiuses, centers = extractRadius( radius )
-
-    for radius, center in zip(radiuses, centers):
-      print radius, center
+    for counter, entry in enumerate(H):
+      if entry > 0:
+        self.assertEqual(entry, len(center[counter]) )
 
   def tstcalcPoints( self ):
     res = calculateCircleFromPoints( self.combinationsList )
@@ -105,7 +100,7 @@ class ToolsTest( unittest.TestCase ):
     
     plt.show()
 
-  def testDiffBackground(self):
+  def tstDiffBackground(self):
     background_hits = range(51)
     for i in background_hits:
       path = '../data/1_ring_diff_bg/1_circle_%s_bg.txt' % i

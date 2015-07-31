@@ -12,6 +12,7 @@ import pdb
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from scipy import misc as sp
 
 
 from Tools import readFile, S_ERROR, S_OK
@@ -19,7 +20,7 @@ from timer import Timer
 
 
 
-NUMBER_OF_R_BINS = 200 #bins for radius
+NUMBER_OF_R_BINS = 1000 #bins for radius
 NUMBER_OF_S_BINS = 1000 #bins for space
 VISUALISATION = True
 
@@ -42,6 +43,8 @@ def SHistogram(data, number_of_bins, hrange=None):
     mn, mx = hrange
     if mn > mx:
       raise AttributeError('max must be larger than min')
+  else:
+    mn, mx = 0,1
   
   data_array = [None for _ in range(number_of_bins)]
   bins = np.linspace(mn, mx, number_of_bins+1)
@@ -66,7 +69,10 @@ def SHistogram(data, number_of_bins, hrange=None):
     n += VW
     for counter,i in enumerate(VW):
       if i > 0:
-        data_array[counter] = b[:i]
+        if data_array[counter]:
+          data_array[counter] += b[:i]
+        else:
+          data_array[counter] = b[:i]
         b = b[i:]
       else:
         continue
@@ -89,7 +95,9 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
     a = np.linalg.norm( C - B )
     b = np.linalg.norm( C - A )
     c = np.linalg.norm( B - A )
-    max_distance = 0.5
+    #maximum distance between 2 points on a circle is 2*r, we know r shouldn't be bigger than 0.15 so if 2
+    #points are further apart this triple isn't interesting for us
+    max_distance = 0.3
     if a > max_distance or b > max_distance or c > max_distance:
       continue
     a2 = a*a
@@ -99,7 +107,8 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
 
     R = a * b * c / 4 / np.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) )
     
-    if R<1:
+    #maximum radius is 0.15 everything larger we forget
+    if R<0.15:
       if onlyRadius:
         r.append(R)
       else: 
@@ -113,16 +122,13 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
 
   return xy, r
 
-def fullCenterHistogram( xy ):
+def fullCenterHistogram( xy, bins=NUMBER_OF_S_BINS ):
   x,y = zip(*xy)
-  H, xedges, yedges = np.histogram2d(x,y,NUMBER_OF_S_BINS,[[-1, 1], [-1, 1]])
-  fig = plt.figure()
-  plt.imshow(H, interpolation='nearest', origin='low',
-                extent=[ xedges[0], xedges[-1], yedges[0], yedges[-1]])
+  H, xedges, yedges, _ = plt.hist2d(x,y,bins, [[-0.5,0.5],[-0.5,0.5]])
   plt.colorbar()
   plt.show()
 
-def main( combinationsList ):
+def main( combinationsList, n ):
   """ With the help of barycentric coordinates we calculate the radius and the center defined by each tuple of 3 points given as parameter
 
   @param: combinationsList: a list of all possible combinations of 3 points
@@ -148,10 +154,12 @@ def main( combinationsList ):
 
   # create a background histogram
   #bkgHistogram, edges = backgroundHistogram('../data/left_to_right/2_0_circles_30_bg.txt')
-
+  factor = sp.comb(600,3)/sp.comb(n,3)
+  bkgHistogram = np.loadtxt('600_bg_r.txt')
+  bkgHistogram /= factor
 
   radius = {}
-  radius['H'] = radius_histogram #- bkgHistogram
+  radius['H'] = radius_histogram# - bkgHistogram
   radius['xedges'] = edges
   radius['center_data'] = center_data
 
@@ -159,6 +167,7 @@ def main( combinationsList ):
 
   radiuses, center_data = extractRadius(radius)
 
+  res = []
   # check for each radius if we have a peak in center_data
 
   for radius, center in zip(radiuses, center_data):
@@ -171,24 +180,40 @@ def main( combinationsList ):
     #visualizeCenterHistogram(x,y)
     circle_center = extractCenter(center_dict)
     if len(circle_center) > 0:
-      print radius, circle_center
-  return S_OK()
+      res.append( { 'radius' : radius, 'center' : circle_center } )
+  return S_OK( res )
+
+def extractRadius( radius_dict ):
+  """ Simple method to find possible radiuses. Find highest entry in histogram, save the value and set bin to 0 and then look for the next.
 
 
-def backgroundHistogram( filename ):
-  """ Creates a histogram for both radius and center for a given filename. It is used for creating background histograms so we can minimize
-      false hits from background and mismatched 3tuples (2 points of one circle and one of another e.g.)
-
-      :param filename: path to the source text file with the background points
-      :returns center dict and radius dict.
+      :param dict radius: radius dicitonary with 'H' histogram, 'xedges' and 'yedges'
+      :returns radius, center_data
   """
-  data = readFile( filename )
-  combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
-  xy, r = calculateCircleFromPoints( combinationsList )
-  bkgHistogram, edges = np.histogram(r, NUMBER_OF_R_BINS, [0,2])
-  return bkgHistogram, edges
-  
-  
+  radiuses = []
+  center_data = []
+  H = radius_dict['H']
+  edges = radius_dict['xedges']
+  center = radius_dict['center_data']
+  while True:
+    i = np.argmax(H)
+    n = NUMBER_OF_R_BINS
+    n_entries = sum(H[i-1 if i>0 else i:i+2 if i<n-1 else i+1])
+    if n_entries < 120:
+      # there are less than 200 entries in 3 bins
+      break
+
+    radiuses.append(edges[i])
+    index_list = range(i-1 if i>0 else i,i+2 if i<n-1 else i+ 1)
+    center_list = []
+    for index in index_list:
+      if center[index]:
+        center_list += center[index]
+      H[index] = 0
+    center_data.append(center_list)
+         
+  return radiuses, center_data 
+
 def extractCenter( center_dict ):
   """ Simple method to find possible circle centers. Find highest entry in histogram save the value and set bin to 0 so we can look for the next.
       we do this <x> times.
@@ -217,8 +242,7 @@ def extractCenter( center_dict ):
     index = np.argmax(H)
     i, j = np.unravel_index( index, (NUMBER_OF_S_BINS, NUMBER_OF_S_BINS) )
     n_entries =   sum(sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j-1 if j>0 else j:j+2 if j<n else j+1]))
-
-    if n_entries < 25:
+    if n_entries < 100:
       break
 
     # Set the entries to 0 so they won't contribute twice
@@ -228,42 +252,30 @@ def extractCenter( center_dict ):
       for j in j_index:
         H[i][j] = 0
     
-    centers.append( (xedges[i], yedges[j]) )
+    centers.append( {'center' : (xedges[i], yedges[j]), 'nEnries' : n_entries } )
 
   return centers
 
-def extractRadius( radius_dict ):
-  """ Simple method to find possible radiuses. Find highest entry in histogram, save the value and set bin to 0 and then look for the next.
+def backgroundHistogram( filename ):
+  """ Creates a histogram for both radius and center for a given filename. It is used for creating background histograms so we can minimize
+      false hits from background and mismatched 3tuples (2 points of one circle and one of another e.g.)
 
-
-      :param dict radius: radius dicitonary with 'H' histogram, 'xedges' and 'yedges'
-      :returns radius, center_data
+      :param filename: path to the source text file with the background points
+      :returns center dict and radius dict.
   """
-  radiuses = []
-  center_data = []
-  H = radius_dict['H']
-  edges = radius_dict['xedges']
-  center = radius_dict['center_data']
-  while True:
-    i = np.argmax(H)
-    n = NUMBER_OF_R_BINS
-    n_entries = sum(H[i-1 if i>0 else i:i+2 if i<n-1 else i+1])
-    if n_entries < 150:
-      # there are less than 200 entries in 3 bins
-      break
-
-    radiuses.append(edges[i])
-    center_data.append(center[i])
-    index_list = range(i-1 if i>0 else i,i+2 if i<n-1 else i+ 1)
-    for index in index_list:
-      H[index] = 0
-  return radiuses, center_data 
-
-def visualizeCenterHistogram( x,y ):
+  data = readFile( filename )
+  combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+  xy, r = calculateCircleFromPoints( combinationsList )
+  bkgHistogram, edges = np.histogram(r, NUMBER_OF_R_BINS, [0,2])
+  return bkgHistogram, edges
+  
+  
+def visualizeCenterHistogram( x,y, bins=NUMBER_OF_S_BINS ):
   if not VISUALISATION:
     pass
   else:
-    H, xedges, yedges, _ = plt.hist2d(x,y,NUMBER_OF_S_BINS, [[-0.5,0.5],[-0.5,0.5]])
+    H, xedges, yedges, _ = plt.hist2d(x,y,bins, [[-0.5,0.5],[-0.5,0.5]])
+    plt.colorbar()
     plt.show()
   
   
@@ -275,9 +287,15 @@ def visualizeRadiusHistogram( radius ):
     edges = np.arange(0,1,step)
     H = radius['H']
     plt.bar(edges,H, width=step)
-    plt.xlim(min(edges), max(edges))
+    plt.xlim(0 , 0.15)
     
     plt.show()
+
+def setUp( path ):
+  data = readFile( path )
+  combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+  res = main( combinationsList, n=len(data['allPoints']) )
+  return res
 
 if __name__ == '__main__': 
   #### read data #####
@@ -286,7 +304,12 @@ if __name__ == '__main__':
   path = sys.argv[1]
   data = readFile( path )
   combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
-  res = main( combinationsList )
+  res = main( combinationsList, n=len(data['allPoints']) )
+  if res['OK']:
+    res = res['Value']
+    for entry in res:
+      print entry['radius']
+      print entry['center']
 
   
     
