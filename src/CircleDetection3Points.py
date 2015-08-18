@@ -82,7 +82,10 @@ def SHistogram(data, number_of_bins, hrange=None):
 
 
 def calculateCircleFromPoints(combinationsList, onlyRadius=False):
-  """ Calculate the circle from 3 given points. 
+  """ Calculate the circle from 3 given points. Discard points that are further than 0.3 apart. Discard points that create a
+  Circle with a radius larger than 0.15.
+
+  For radius background histograms we have the parameter onlyRadius when we are only interested in the radiuses.
 
   """
   r = []
@@ -100,9 +103,6 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
     max_distance = 0.3
     if a > max_distance or b > max_distance or c > max_distance:
       continue
-    a2 = a*a
-    b2 = b*b
-    c2 = c*c
     s = ( a + b + c ) / 2
 
     R = a * b * c / 4 / np.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) )
@@ -112,6 +112,9 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
       if onlyRadius:
         r.append(R)
       else: 
+        a2 = a*a
+        b2 = b*b
+        c2 = c*c
         lambda1 = a2 * ( b2 + c2 - a2 )
         lambda2 = b2 * ( a2 + c2 - b2 )
         lambda3 = c2 * ( a2 + b2 - c2 )
@@ -204,7 +207,7 @@ def extractRadius( radius_dict ):
       break
 
     radiuses.append(edges[i])
-    index_list = range(i-1 if i>0 else i,i+2 if i<n-1 else i+ 1)
+    index_list = range(i-1 if i>0 else i,i+2 if i<n-1 else i+1)
     center_list = []
     for index in index_list:
       if center[index]:
