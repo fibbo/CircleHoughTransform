@@ -6,6 +6,7 @@ Created on Apr 29, 2015
 
 import sys
 import itertools
+import pprint
 import pdb
 
 
@@ -15,7 +16,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from scipy import misc as sp
-
+from visualizeData import plotData, convertTuplesToList
 
 from Tools import readFile, S_ERROR, S_OK
 from timer import Timer
@@ -168,7 +169,7 @@ def main( combinationsList, n ):
   radius['xedges'] = edges
   radius['center_data'] = center_data
 
-  visualizeRadiusHistogram(radius)
+  #visualizeRadiusHistogram(radius)
 
   radiuses, center_data = extractRadius(radius)
 
@@ -185,11 +186,13 @@ def main( combinationsList, n ):
     #visualizeCenterHistogram(x,y)
     circle_center = extractCenter(center_dict)
     if len(circle_center) > 0:
-      res.append( { 'radius' : radius, 'center' : circle_center } )
+      for circle_data in circle_center:
+        res.append( { 'radius' : radius, 'center' : circle_data['center'], 'nEntries' : circle_data['nEntries'] } )
   return S_OK( res )
 
 def extractRadius( radius_dict ):
-  """ Simple method to find possible radiuses. Find highest entry in histogram, save the value and set bin to 0 and then look for the next.
+  """ Simple method to find possible radiuses. Find highest entry in histogram, save the value and set bin to 0 
+      and then look for the next.
 
 
       :param dict radius: radius dicitonary with 'H' histogram, 'xedges' and 'yedges'
@@ -257,7 +260,7 @@ def extractCenter( center_dict ):
       for j in j_index:
         H[i][j] = 0
     
-    centers.append( {'center' : (xedges[i], yedges[j]), 'nEnries' : n_entries } )
+    centers.append( {'center' : (xedges[i], yedges[j]), 'nEntries' : n_entries } )
 
   return centers
 
@@ -274,7 +277,21 @@ def backgroundHistogram( filename ):
   bkgHistogram, edges = np.histogram(r, NUMBER_OF_R_BINS, [0,2])
   return bkgHistogram, edges
   
-  
+def guessFakes( results ):
+  res = []
+
+  while len(results):
+    circle = results.pop()
+    unique = True
+    if circle['nEntries'] < 300:
+      for dic in results:
+        if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < 0.020 or\
+           (np.linalg.norm(circle['radius'] - dic['radius']) < 0.020):
+          unique = False
+    if unique:
+      res.append(circle)
+  return res
+
 def visualizeCenterHistogram( x,y, bins=NUMBER_OF_S_BINS ):
   if not VISUALISATION:
     pass
@@ -296,6 +313,7 @@ def visualizeRadiusHistogram( radius ):
     
     plt.show()
 
+
 def setUp( path ):
   data = readFile( path )
   combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
@@ -306,15 +324,18 @@ if __name__ == '__main__':
   #### read data #####
   if len( sys.argv ) < 2:
     sys.exit( 'Please provide file to be read' )
+  pp = pprint.PrettyPrinter(depth=6)
   path = sys.argv[1]
   data = readFile( path )
+  fileName = sys.argv[1][-12:-4]+".png"
+  x,y = convertTuplesToList(data['allPoints'])
   combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
   res = main( combinationsList, n=len(data['allPoints']) )
   if res['OK']:
     res = res['Value']
-    for entry in res:
-      print entry['radius']
-      print entry['center']
+    circles = guessFakes(res)
+    plotData(x,y,circles,savePath=fileName)
+
 
   
     
