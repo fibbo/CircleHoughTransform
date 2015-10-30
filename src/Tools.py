@@ -81,3 +81,28 @@ def S_ERROR( messageString = '' ):
 
 def S_OK( value = None ):
   return { 'OK' : True, 'Value' : value }
+
+def combinations(iterable, r):
+  # combinations('ABCD', 2) --> AB AC AD BC BD CD
+  # combinations(range(4), 3) --> 012 013 023 123
+  pool = tuple(iterable)
+  n = len(pool)
+  if r > n:
+      return
+  indices = range(r)
+  yield tuple(pool[i] for i in indices)
+  while True:
+    for i in reversed(range(r)):
+      if indices[i] != i + n - r:
+        break
+    else:
+      return
+    indices[i] += 1
+    for j in range(i+1, r):
+        indices[j] = indices[j-1] + 1
+    res = tuple(pool[i] for i in indices)
+    max_distance = 0.15
+    if np.linalg.norm(res[0]-res[1]) > max_distance or np.linalg.norm(res[0]-res[2]) > max_distance or np.linalg.norm(res[1]-res[2]) > max_distance:
+      continue
+    else:
+      yield res

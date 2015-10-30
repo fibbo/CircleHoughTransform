@@ -39,9 +39,12 @@ def findDataWithXCircles( db, circles ):
 
 def getCircleData( db, eventnumber ):
   for ring in db[eventnumber]['rings']:
+    print "------"
+    print "center: %s" % (ring['center'],)
     print "nPe: %s" % ring['nPe']
     print "radius: %s" % ring['radius']
-    print "center: %s" % (ring['center'],)
+
+    
 
 def pointsPerCircleDistribution( db ):
   points = []
@@ -61,10 +64,24 @@ def ringsPerEventDistribution( db ):
   plt.hist(rings,15)
   plt.show()
 
+def maxPoints( db ):
+  maxPoints = 0
+  for i,event in enumerate(db):
+    nPoints = 0
+    nPoints += event['nBkg']
+    for ring in event['rings']:
+      nPoints += ring['nPe']
 
+    if nPoints > maxPoints:
+      maxPoints = nPoints
+      eventnumber = i
+  print eventnumber
+
+maxPoints( db )
+#print db[3]
 #ringsPerEventDistribution( db )
-pointsPerCircleDistribution(db)
-#print findDataWithXCircles(db, 8)
-# getCircleData( db, 2275)
+# pointsPerCircleDistribution(db)
+#print findDataWithXCircles(db, 2)
+getCircleData( db, 3)
 # print findCircleWithLeastPoints(db)
 #print findMaxRadius( db )

@@ -35,8 +35,8 @@
 \definecolor{ockerrot}{rgb}{0.859,0.375,0.152}
 
 
-\captionsetup{margin=0pt,font=small,labelfont=sc,labelformat=simple,format=plain,indention=3mm,
- labelsep=endash,textfont=sf,font=sf,singlelinecheck=false,figurename=Fig.,tablename=Tab.}
+% \captionsetup{margin=0pt,font=small,labelfont=sc,labelformat=simple,format=plain,indention=3mm,
+%  labelsep=endash,textfont=sf,font=sf,singlelinecheck=false,figurename=Fig.,tablename=Tab.}
 
 
 \fontfamily{ppl}\selectfont
@@ -47,6 +47,40 @@
 Test
 
 \chapter{Theory}
-test 2
 
+\section{RICH Detector} % (fold)
+\label{sec:rich_detector}
+
+Particle identification is a fundamental requirement at the LHCb experiment. Meaningful CP-violation measurements are only possible if hadron identification is available hence the ability to distinguish between kaons and pions is  essential.
+% section rich_detector (end)
+
+
+\chapter{Methods}
+
+\section{Histogram methods}
+
+\section{Combinatorial approach}
+
+The combinatorial approach relies on the fact that a circle is uniquely defined by 3 points. With 2 arbotrary points we couldn't tell which side the circle is
+going to go. A third point gives us all the information we need. The general idea then is the following:
+
+\begin{enumerate}
+\item Build all possible triples of points given the data points
+\item For all the point triples calculate the center and the radius of the potential circle
+\item Due to constraints in the radius we can drop many of the circles with a radius bigger than a certain threshold
+\item Create a histogram with the radius distribution. Peaks in the radius distribution hint to a circle.
+\item We scan the radius histogram for peaks and look at the center point histogram for the given radius of a peak. If we have also a peak in the center point histogram
+      the set of the points of the triples lie on a circle with a radius and center given by the histogram peaks.
+\end{enumerate}
+
+\subsection{Drawback}
+
+There are 2 problems with this method.
+
+\begin{itemize}
+\item The combinatorics blow up with a high number of data points \( {n}\choose{3} \)
+\item Also assuming we have a infinite amount of data points then we would also find an infinite number of circles
+\end{itemize}
+
+\chapter{Results}
 \end{document}

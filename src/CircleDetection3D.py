@@ -95,7 +95,7 @@ def findCircles( data, weight_function, space_dim = 100, r_dim = 100 ):
 
 
 def removePoints( center, data, r ):
-  """ Given a center point we found we remove points that are on those circle.
+  """ Given a center point we found we remove points that are on this circle.
 
   :params float tuple center: (cx, cy) x and y coordinate of the center
   :params dict data: contains the data points

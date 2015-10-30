@@ -8,15 +8,17 @@ import sys
 import itertools
 import pprint
 import pdb
-
+import pickle
+import os
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from scipy import misc as sp
 from visualizeData import plotData, convertTuplesToList
+from artificial_circle import generateCircle
 
-from Tools import readFile, S_ERROR, S_OK
+from Tools import readFile, S_ERROR, S_OK, combinations
 from timer import Timer
 
 
@@ -133,7 +135,10 @@ def fullCenterHistogram( xy, bins=NUMBER_OF_S_BINS ):
   plt.show()
 
 def main( combinationsList, n ):
-  """ With the help of barycentric coordinates we calculate the radius and the center defined by each tuple of 3 points given as parameter
+  """ Main logic of the algorithm. Here we put all the results from the
+  other methods together and finally return a list of possible circles.
+
+  With the help of barycentric coordinates we calculate the radius and the center defined by each tuple of 3 points given as parameter
 
   @param: combinationsList: a list of all possible combinations of 3 points
   @returns: a center and radius dictionaries.
@@ -239,24 +244,37 @@ def extractCenter( center_dict ):
 
   #TODO: to be able to set a mask to set values around the maximum index to 0
   # for example
-  #                          000
-  #                          0x0
-  #                          000
+  #                          111
+  #                          1x1
+  #                          111
   #
   # so x is the maximum we found and we want to set adjacent values to 0 as well
   while True:
     index = np.argmax(H)
     i, j = np.unravel_index( index, (NUMBER_OF_S_BINS, NUMBER_OF_S_BINS) )
-    n_entries =   sum(sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j-1 if j>0 else j:j+2 if j<n else j+1]))
-    if n_entries < 100:
+    #n_entries =   sum(sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j-1 if j>0 else j:j+2 if j<n else j+1]))
+    
+
+    # this variation only takes the adjacent values of i,j
+    #
+    #              1
+    #             1x1 
+    #              1
+    n_entries =   sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j]) + sum(H[i, j-1 if j>0 else j:j+2 if j+2 <= 3 else j+1]) - H[i,j]
+    if n_entries < 120:
       break
 
     # Set the entries to 0 so they won't contribute twice
     i_index = range(i-1 if i>0 else i,i+2 if i<n else i+1)
     j_index = range(j-1 if j>0 else j,j+2 if j<n else j+1)
-    for i in i_index:
-      for j in j_index:
-        H[i][j] = 0
+    for ii in i_index:
+      H[ii][j] = 0  
+
+    for jj in j_index:
+      H[i][jj] = 0
+    # for i in i_index:
+    #   for j in j_index:
+    #     H[i][j] = 0
     
     centers.append( {'center' : (xedges[i], yedges[j]), 'nEntries' : n_entries } )
 
@@ -275,20 +293,27 @@ def backgroundHistogram( filename ):
   bkgHistogram, edges = np.histogram(r, NUMBER_OF_R_BINS, [0,2])
   return bkgHistogram, edges
   
-def guessFakes( results ):
-  res = []
+def removeFakes( results ):
+  """ 
 
-  while len(results):
-    circle = results.pop()
+  """
+  res = []
+  sorted_results = sorted( results, key=lambda k: k['nEntries'], reverse=True)
+  while len(sorted_results):
+    circle = sorted_results.pop()
     unique = True
-    if circle['nEntries'] < 300:
-      for dic in results:
-        if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < 0.020 or\
-           (np.linalg.norm(circle['radius'] - dic['radius']) < 0.020):
-          unique = False
+
+    for dic in sorted_results:
+      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < 0.020 and\
+         (np.linalg.norm(circle['radius'] - dic['radius']) < 0.005):
+        unique = False
     if unique:
       res.append(circle)
+
   return res
+
+def compareRings( db_rings, results):
+  pass
 
 def visualizeCenterHistogram( x,y, bins=NUMBER_OF_S_BINS ):
   if not VISUALISATION:
@@ -318,23 +343,36 @@ def setUp( path ):
   res = main( combinationsList, n=len(data['allPoints']) )
   return res
 
+def openDB():
+  f = open('../db.pkl')
+  db = pickle.load(f)
+  return db
+
 if __name__ == '__main__': 
   #### read data #####
-  if len( sys.argv ) < 2:
-    sys.exit( 'Please provide file to be read' )
+  if len( sys.argv ) == 2:
+    path = sys.argv[1]
+    data = readFile( path )  
+    fileName = sys.argv[1][-12:-4]+".png"
+  else:
+    data = {}
+    res = generateCircle(0.12, (0,0), background=100)
+    data['allPoints'] = res
+    fileName = 'tttt.png'
   pp = pprint.PrettyPrinter(depth=6)
-  path = sys.argv[1]
-  data = readFile( path )
-  fileName = sys.argv[1][-12:-4]+".png"
   x,y = convertTuplesToList(data['allPoints'])
-  combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
-  res = main( combinationsList, n=len(data['allPoints']) )
+  with Timer() as t:
+    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+  print "Time for creating triple list: %ss" % t.secs
+  with Timer() as t:
+    res = main( combinationsList, n=len(data['allPoints']) )
+  print "Time for main algorithm: %ss" % t.secs
   if res['OK']:
     res = res['Value']
-    circles = guessFakes(res)
+    # pp.pprint( res )
+    circles = removeFakes(res)
+    db = openDB()
+    rings = db[int(fileName[4:-4])]
+    print rings
     plotData(x,y,circles,savePath=fileName)
-
-
-  
-    
 
