@@ -7,7 +7,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
-
+\usepackage[bibencoding=utf8, backend=biber, style=apa, minbibnames=1, maxnames=5]{biblatex}
 
 \usepackage{a4,color}
 
@@ -35,16 +35,27 @@
 \definecolor{ockerrot}{rgb}{0.859,0.375,0.152}
 
 
-% \captionsetup{margin=0pt,font=small,labelfont=sc,labelformat=simple,format=plain,indention=3mm,
-%  labelsep=endash,textfont=sf,font=sf,singlelinecheck=false,figurename=Fig.,tablename=Tab.}
+\captionsetup{margin=0pt,font=small,labelfont=sc,labelformat=simple,format=plain,indention=3mm,
+ labelsep=endash,textfont=sf,font=sf,singlelinecheck=false,figurename=Fig.,tablename=Tab.}
 
 
 \fontfamily{ppl}\selectfont
 
 
 \begin{document}
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Abstract stuff
+	
+
 \chapter{Introduction}
-Test
+\section{LHC - Large Hadron Collider} % (fold)
+\label{sec:lhc_large_hadron_collider}
+
+The Large Hadron Collider (LHC) is the world's largest particle collider ever built. 
+
+% section lhc_large_hadron_collider (end)
 
 \chapter{Theory}
 
@@ -74,6 +85,7 @@ going to go. A third point gives us all the information we need. The general ide
 \end{enumerate}
 
 \subsection{Drawback}
+	
 
 There are 2 problems with this method.
 

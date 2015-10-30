@@ -15,3 +15,7 @@
 *.toc
 Circle.sublime-project
 *.sublime-workspace
+*.bcf
+*.blg
+*.fls
+*.run.xml
