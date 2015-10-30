@@ -1,8 +1,6 @@
 import pickle
 import os
 
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 f = open('../db.pkl')
