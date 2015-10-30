@@ -13,3 +13,5 @@
 *.snm
 *.synctex.gz
 *.toc
+Circle.sublime-project
+*.sublime-workspace
