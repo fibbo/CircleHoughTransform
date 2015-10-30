@@ -1,6 +1,8 @@
 import pickle
 import os
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 f = open('../db.pkl')
@@ -80,8 +82,8 @@ def maxPoints( db ):
 maxPoints( db )
 #print db[3]
 #ringsPerEventDistribution( db )
-# pointsPerCircleDistribution(db)
-#print findDataWithXCircles(db, 2)
-getCircleData( db, 3)
+#pointsPerCircleDistribution(db)
+#print findDataWithXCircles(db, 4)
+getCircleData( db, 9999)
 # print findCircleWithLeastPoints(db)
 #print findMaxRadius( db )
