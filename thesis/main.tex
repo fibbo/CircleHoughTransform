@@ -1,5 +1,5 @@
 \documentclass[10pt,twoside]{scrreprt}
-
+\usepackage{scrhack}
 \renewcommand{\textfraction}{0.001}
 \renewcommand{\topfraction}{0.999}   
 \renewcommand{\bottomfraction}{0.999}
@@ -10,7 +10,7 @@
 \usepackage[bibencoding=utf8, backend=biber, style=apa, minbibnames=1, maxnames=5]{biblatex}
 
 \usepackage{a4,color}
-
+\usepackage{tikz}
 
 \usepackage{caption}
 \usepackage{float}
@@ -65,10 +65,58 @@ The Large Hadron Collider (LHC) is the world's largest particle collider ever bu
 Particle identification is a fundamental requirement at the LHCb experiment. Meaningful CP-violation measurements are only possible if hadron identification is available hence the ability to distinguish between kaons and pions is  essential.
 % section rich_detector (end)
 
+\section{Cherenkov-Radiation} % (fold)
+\label{sec:cherenkov_radiation}
 
+The speed of light in vacuum, \( \mathbf{c} \), is a universal physical constant. According to Einstein's special theory of relativity, \( c \) is the maximum speed at which all matter (or information) in the universe can travel. The speed at which light propagates in a medium, however, can be significantly less can \( c \).
+
+Cherenkov radiation results when a charged particle travels through a dielectric medium with a speed greather than the speed of light through said medium. Moreover, the velocity that must be exceeded is the phase velocity \( v_p \) and not the group velocity \( v_G = \frac{\partial \omega}{\partial k} \).
+
+\[ v_P = \frac{\lambda}{T} \quad \text{or} \quad \frac{\omega}{k}\]
+
+As a charged particle travels through the medium, it disrupts the local electromagnetic field. If the particle travels slowly then the disturbance elastically relaxes to the mechinal equilibrium as the particle passes. However, if the particle travels fast enough, the limited response speed of the medium means that a disturbance is left in the wake of the particle, and the energy in this disturbance radiates as coherent shockwave.
+
+\begin{figure}[htbp]
+	\centering
+		\begin{tikzpicture}
+			\draw (-1,0) -- (3,0);
+			\draw (0,0) -- (0.5,1) -- (3,0);
+			\draw (0,0) -- (0.5,-1) -- (3,0);
+			\draw[->, red, thick] (-1,0) -- (-0.5,0);
+		\end{tikzpicture}
+	\caption{Cherenkov radiation}
+	\label{fig:label}
+\end{figure}
+
+\begin{align}
+    x_p &= v_{p}\cdot t = \beta c t \nonumber \\
+    x_{\text{em}} &= v_{\text{em}}\cdot t=\frac{c}{n}t \nonumber \\
+    \cos\theta &= \frac{x_{\text{p}}}{x_{\text{em}}} = \frac{\frac{c}{n}t}{\beta c t} = \frac{1}{n\beta}
+\end{align}
+
+% section cherenkov_radiation (end)
 \chapter{Methods}
 
-\section{Histogram methods}
+\section{Hough Transform} % (fold)
+\label{sec:hough_transform}
+
+% section hough_transform (end)
+
+\subsection{1D: Known Center - Find Radius} % (fold)
+\label{sub:1d_known_center_find_radius}
+
+
+
+% subsection 1d_known_center_find_radius (end)
+\subsection{2D: Known Radius - Find Center} % (fold)
+\label{sub:2d_known_radius_find_center}
+
+% section 2d_known_radius_find_center (end)
+
+\subsection{3D: Nothing is Known - Find Everything} % (fold)
+\label{sub:3d_nothing_is_known_find_everything}
+
+% subsection 3d_nothing_is_known_find_everything (end)
 
 \section{Combinatorial approach}
 
@@ -90,7 +138,7 @@ going to go. A third point gives us all the information we need. The general ide
 There are 2 problems with this method.
 
 \begin{itemize}
-\item The combinatorics blow up with a high number of data points \( {n}\choose{3} \)
+\item The combinatorics blow up with a high number of data points \( \binom{N}{3} \)
 \item Also assuming we have a infinite amount of data points then we would also find an infinite number of circles
 \end{itemize}
 
