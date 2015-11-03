@@ -305,7 +305,7 @@ def removeFakes( results ):
 
     for dic in sorted_results:
       if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < 0.020 and\
-         (np.linalg.norm(circle['radius'] - dic['radius']) < 0.005):
+         (abs(circle['radius'] - dic['radius']) < 0.005):
         unique = False
     if unique:
       res.append(circle)
@@ -313,7 +313,15 @@ def removeFakes( results ):
   return res
 
 def compareRings( db_rings, results):
-  pass
+  found_circles = []
+  missed_circles = []
+  fake_circles = []
+  for result_ring in results:
+    if any(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center'])) < 0.010 and abs(result_ring['radius']-db_ring['radius']) < 0.005 for db_ring in db_rings):
+      found_circles.append(result_ring)
+
+  return found_circles
+
 
 def visualizeCenterHistogram( x,y, bins=NUMBER_OF_S_BINS ):
   if not VISUALISATION:
@@ -372,7 +380,8 @@ if __name__ == '__main__':
     # pp.pprint( res )
     circles = removeFakes(res)
     db = openDB()
-    rings = db[int(fileName[4:-4])]
-    print rings
+    entry = db[int(fileName[4:-4])]['rings']
+    found_circles = compareRings(entry, circles)
+    print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
     plotData(x,y,circles,savePath=fileName)
 
