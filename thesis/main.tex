@@ -96,6 +96,7 @@ As a charged particle travels through the medium, it disrupts the local electrom
 \end{align}
 
 which is independent from the angle \( \theta \).
+% section cherenkov_radiation (end)
 
 \section{Hough Transform} % (fold)
 \label{sec:hough_transform}
@@ -160,12 +161,19 @@ that lies on the same straight line in the plane will produce a sinusoidal curve
 \subsection{Circle Hough Transform} % (fold)
 \label{sub:circle_hough_transform}
 
-For this thesis we are interested in circle detection so we need to adapt our linear Hough Transform in order to find circles.
+For this thesis we are interested in circle detection so we need to adapt our linear Hough Transform in order to find circles. In a two dimensional space, a circle can be described by:
+
+\begin{equation}
+		(x-c_x)^2 + (y-c_y)^2 = r^2
+\end{equation}
+
+Where $(c_x,c_y)$ is the center of the circle.
+
 % subsection circle_hough_transform (end)
 
 % section hough_transform (end)
 
-% section cherenkov_radiation (end)
+
 \chapter{Methods}
 
 \section{Conventional Hough-Transforms} % (fold)
