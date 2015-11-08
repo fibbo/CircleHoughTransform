@@ -19,3 +19,4 @@ Circle.sublime-project
 *.blg
 *.fls
 *.run.xml
+*.bbl
