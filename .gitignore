@@ -3,7 +3,7 @@
 *.pkl
 *.pyc
 *.pyx
-*.~
+*.*~
 *.aux
 *.fdb*
 *.log
@@ -19,3 +19,6 @@ Circle.sublime-project
 *.fls
 *.run.xml
 *.bbl
+/img
+/data
+/serie0
