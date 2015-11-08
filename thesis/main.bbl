@@ -1,0 +1,61 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.4 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \sortlist{nty}{nty}
+    \entry{Duda:1972}{article}{}
+      \name{labelname}{2}{}{%
+        {{hash=2033e870a442868d0d9b4c34797e8259}{Duda}{D\bibinitperiod}{Richard\bibnamedelima O.}{R\bibinitperiod\bibinitdelim O\bibinitperiod}{}{}{}{}}%
+        {{hash=9faccd7cefce54e75fa36db39e213ee5}{Hart}{H\bibinitperiod}{Peter\bibnamedelima E.}{P\bibinitperiod\bibinitdelim E\bibinitperiod}{}{}{}{}}%
+      }
+      \name{author}{2}{}{%
+        {{hash=2033e870a442868d0d9b4c34797e8259}{Duda}{D\bibinitperiod}{Richard\bibnamedelima O.}{R\bibinitperiod\bibinitdelim O\bibinitperiod}{}{}{}{}}%
+        {{hash=9faccd7cefce54e75fa36db39e213ee5}{Hart}{H\bibinitperiod}{Peter\bibnamedelima E.}{P\bibinitperiod\bibinitdelim E\bibinitperiod}{}{}{}{}}%
+      }
+      \list{location}{1}{%
+        {New York, NY, USA}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{ddb787b1a2b1435e0c7f3834e52e71ea}
+      \strng{fullhash}{ddb787b1a2b1435e0c7f3834e52e71ea}
+      \field{sortinit}{D}
+      \field{sortinithash}{a01c54d1737685bc6dbf0ea0673fa44c}
+      \field{labeltitle}{Use of the Hough Transformation to Detect Lines and Curves in Pictures}
+      \field{issn}{0001-0782}
+      \field{journaltitle}{Commun. ACM}
+      \field{month}{01}
+      \field{number}{1}
+      \field{title}{Use of the Hough Transformation to Detect Lines and Curves in Pictures}
+      \field{volume}{15}
+      \field{year}{1972}
+      \field{pages}{11\bibrangedash 15}
+      \verb{doi}
+      \verb 10.1145/361237.361242
+      \endverb
+      \verb{url}
+      \verb http://doi.acm.org/10.1145/361237.361242
+      \endverb
+      \keyw{Hough transformation,colinear points,curve detection,line detection,pattern recognition,picture processing,point-line transformation}
+    \endentry
+  \endsortlist
+\endrefsection
+\endinput
+
