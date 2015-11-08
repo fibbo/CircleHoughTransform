@@ -12,6 +12,7 @@
 \usepackage{a4,color}
 \usepackage{tikz}
 
+\usepackage{booktabs}
 \usepackage{caption}
 \usepackage{float}
 \usepackage{url}
@@ -128,10 +129,38 @@ where $r$ is the distance from the origin to the closest point in the line and $
 \end{figure}
 % subsection linear_hough_transform (end)
 
+This means given a single point in the plane, the set of all lines going through this point form a sinusoidal curve in $\rho\text{-}\theta$ space. Another point 
+that lies on the same straight line in the plane will produce a sinusoidal curve that intersects with the other at ($\rho\text{-}\theta$).
+
+\subsubsection{Example of a Linear HT} % (fold)
+\label{ssub:example_of_a_linear_ht}
+
+\begin{tikzpicture}
+  \draw[<->] (3,0) -- (0,0) -- (0,3);
+
+  \foreach \x in {0,0.5,1} {
+    \draw[fill] (2-\x, 2-\x) circle (1pt);
+  }
+\end{tikzpicture}
+\begin{table}
+\centering
+\caption{Angle vs Distance}
+\begin{tabular}{rr}
+\toprule
+ Angle & Distance \\
+\midrule
+0 & 2.334 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% subsubsection example_of_a_linear_ht (end)
+
+
 \subsection{Circle Hough Transform} % (fold)
 \label{sub:circle_hough_transform}
 
-For this thesis we are interested in circle detection 
+For this thesis we are interested in circle detection so we need to adapt our linear Hough Transform in order to find circles.
 % subsection circle_hough_transform (end)
 
 % section hough_transform (end)
