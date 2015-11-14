@@ -1,0 +1,23 @@
+# File script to run Tupling over xgen files
+
+# create folders
+mkdir -p /scratch/$USER/$PBS_JOBID
+#cp $PWD/Analysis/RareDecays/Bd2KpiEE/Ntuples/Scripts/Sel/applySelData.C /scratch/$USER/$PBS_JOBID/
+cp $HOME/CircleHT/src/*.py /scratch/$USER/$PBS_JOBID/
+cd /scratch/$USER/$PBS_JOBID
+
+# Run Script 
+# root -l -q -b applySelData.C"(\"$year\",\"$selection\",\"$selTrig\",\"$stripping\",\"\")"
+for i in {$event,$event+5}; do
+  mkdir -p /disk/data3/hep/phi/circleHT/$i
+  python CircleDetection3Points.py Event0000$i.txt
+
+
+#log folder and stuff
+eventdir="/disk/data3/lhcb/phi/circleHT/log/Event$event_$event+5"
+mkdir -p $eventdir
+# Clean up
+cp /scratch/$USER/$PBS_JOBID $eventdir
+
+rm -rf /scratch/$USER/$PBS_JOBID
+
