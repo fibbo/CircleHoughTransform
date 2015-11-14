@@ -26,6 +26,7 @@ from timer import Timer
 NUMBER_OF_R_BINS = 1000 #bins for radius
 NUMBER_OF_S_BINS = 1000 #bins for space
 VISUALISATION = True
+EVENTNUMBER = -1
 
 def SHistogram(data, number_of_bins, hrange=None):
   """ Creates a histogram for a given with number_of_bins entries within the boundaries given by range. 
@@ -141,12 +142,7 @@ def main( combinationsList, n ):
   With the help of barycentric coordinates we calculate the radius and the center defined by each tuple of 3 points given as parameter
 
   @param: combinationsList: a list of all possible combinations of 3 points
-  @returns: a center and radius dictionaries.
-            center contains: - 2d histogram with the center (center['H'])
-                             - xedges of the histogram (center['xedges'])
-                             - yedges of the histogram (center['yedges'])
-            radius contains: - 1d histogram of the radius
-                             - xedges of the histogram
+  @returns: S_OK( resList ): resList is a list of dictionaries of possible circles.
 
   """
 
@@ -162,13 +158,12 @@ def main( combinationsList, n ):
   radius_histogram, edges,  center_data = res['Value']
 
   # create a background histogram
-  #bkgHistogram, edges = backgroundHistogram('../data/left_to_right/2_0_circles_30_bg.txt')
   factor = sp.comb(600,3)/sp.comb(n,3)
   bkgHistogram = np.loadtxt('600_bg_r.txt')
   bkgHistogram /= factor
 
   radius = {}
-  radius['H'] = radius_histogram# - bkgHistogram
+  radius['H'] = radius_histogram - bkgHistogram
   radius['xedges'] = edges
   radius['center_data'] = center_data
 
@@ -177,8 +172,8 @@ def main( combinationsList, n ):
   radiuses, center_data = extractRadius(radius)
 
   res = []
-  # check for each radius if we have a peak in center_data
 
+  # check for each radius if we have a peak in center_data
   for radius, center in zip(radiuses, center_data):
     x,y = zip(*center)
     H, xedges, yedges = np.histogram2d(x,y,NUMBER_OF_S_BINS,[[-0.5, 0.5], [-0.5, 0.5]])
@@ -313,9 +308,18 @@ def removeFakes( results ):
   return res
 
 def compareRings( db_rings, results):
+  """ Compare rings find by the algorithm with the known results from the pickle database. If any circle from the algorithm is within a certain
+  range (radius and center respectively) of a database circle we consider this database circle as found by the algorithm.
+
+  :param list db_rings: list of dictionaries that have the information of the simulated data
+  :param list results: list of dictionaries that have the circles found by the algorithm
+  :return list found_circles: list of dictionaries of circles found in the algorithm that have a match in the database
+
+  """
   found_circles = []
   missed_circles = []
   fake_circles = []
+  # if 
   for result_ring in results:
     if any(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center'])) < 0.010 and abs(result_ring['radius']-db_ring['radius']) < 0.005 for db_ring in db_rings):
       found_circles.append(result_ring)
@@ -352,6 +356,9 @@ def setUp( path ):
   return res
 
 def openDB():
+  """ Open the pickel database. Has all the information of the simulated data
+
+  """
   f = open('../db.pkl')
   db = pickle.load(f)
   return db
@@ -361,6 +368,7 @@ if __name__ == '__main__':
   if len( sys.argv ) == 2:
     path = sys.argv[1]
     data = readFile( path )  
+    EVENTNUMBER = sys.argv[1][-8:-4]
     fileName = sys.argv[1][-12:-4]+".png"
   else:
     data = {}
@@ -377,11 +385,21 @@ if __name__ == '__main__':
   print "Time for main algorithm: %ss" % t.secs
   if res['OK']:
     res = res['Value']
-    # pp.pprint( res )
+
+    pickle_data = {}
+    pickle_data['allRings'] = res
     circles = removeFakes(res)
+
+    pickle_data['noDupRings'] = circles
+
     db = openDB()
-    entry = db[int(fileName[4:-4])]['rings']
+    entry = db[int(EVENTNUMBER)]['rings']
     found_circles = compareRings(entry, circles)
+
+    pickle_data['foundRings'] = found_circles
+
+    pdb.set_trace()
+
     print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
     plotData(x,y,circles,savePath=fileName)
 
