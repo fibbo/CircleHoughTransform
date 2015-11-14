@@ -6,11 +6,13 @@ mkdir -p /scratch/$USER/$PBS_JOBID
 cp $HOME/CircleHT/src/*.py /scratch/$USER/$PBS_JOBID/
 cd /scratch/$USER/$PBS_JOBID
 
+
+src_files="/disk/data1/hep/che/HoughTransform/serie0/files"
 # Run Script 
 # root -l -q -b applySelData.C"(\"$year\",\"$selection\",\"$selTrig\",\"$stripping\",\"\")"
 for i in {$event,$event+5}; do
   mkdir -p /disk/data3/hep/phi/circleHT/$i
-  python CircleDetection3Points.py Event0000$i.txt
+  python CircleDetection3Points.py $src_files/Event0000$i.txt
 
 
 #log folder and stuff
