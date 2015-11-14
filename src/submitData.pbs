@@ -3,7 +3,11 @@
 # create folders
 mkdir -p /scratch/$USER/$PBS_JOBID
 #cp $PWD/Analysis/RareDecays/Bd2KpiEE/Ntuples/Scripts/Sel/applySelData.C /scratch/$USER/$PBS_JOBID/
+<<<<<<< HEAD
 cp $HOME/CircleHT/src/*.py /scratch/$USER/$PBS_JOBID/
+=======
+cp $HOME/workspace/CircleHoughTransform/src/*.py /scratch/$USER/$PBS_JOBID/
+>>>>>>> origin/master
 cd /scratch/$USER/$PBS_JOBID
 
 
