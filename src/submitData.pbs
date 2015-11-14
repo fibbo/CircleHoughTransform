@@ -4,6 +4,8 @@
 mkdir -p /scratch/$USER/$PBS_JOBID
 #cp $PWD/Analysis/RareDecays/Bd2KpiEE/Ntuples/Scripts/Sel/applySelData.C /scratch/$USER/$PBS_JOBID/
 cp $HOME/CircleHoughTransform/src/*.py /scratch/$USER/$PBS_JOBID/
+cp $HOME/CircleHoughTransform/src/600_bg_r.txt /scrath/$USER/$PBS_JOBID/
+ls /scratch/$USER/$PBS_JOBID
 cd /scratch/$USER/$PBS_JOBID
 
 
