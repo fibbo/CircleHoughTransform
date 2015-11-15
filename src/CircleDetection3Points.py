@@ -360,7 +360,7 @@ def openDB():
   """ Open the pickel database. Has all the information of the simulated data
 
   """
-  f = open('../db.pkl')
+  f = open('db.pkl')
   db = pickle.load(f)
   return db
 
@@ -398,8 +398,6 @@ if __name__ == '__main__':
     found_circles = compareRings(entry, circles)
 
     pickle_data['foundRings'] = found_circles
-
-    pdb.set_trace()
 
     print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
     plotData(x,y,circles,savePath=fileName)

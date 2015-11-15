@@ -1,26 +1,36 @@
-# File script to run Tupling over xgen files
+# File script to run circle detection algorithm 
 
 # create folders
 mkdir -p /scratch/$USER/$PBS_JOBID
-#cp $PWD/Analysis/RareDecays/Bd2KpiEE/Ntuples/Scripts/Sel/applySelData.C /scratch/$USER/$PBS_JOBID/
+
 cp $HOME/CircleHoughTransform/src/*.py /scratch/$USER/$PBS_JOBID/
-cp $HOME/CircleHoughTransform/src/600_bg_r.txt /scrath/$USER/$PBS_JOBID/
-ls /scratch/$USER/$PBS_JOBID
+cp $HOME/CircleHoughTransform/src/600_bg_r.txt /scratch/$USER/$PBS_JOBID/
+cp $HOME/CircleHoughTransform/src/db.pkl /scratch/$USER/$PBS_JOBID/
 cd /scratch/$USER/$PBS_JOBID
 
 
+# Setting path for event source files
 src_files="/disk/data1/hep/che/HoughTransform/serie0/files"
-# Run Script 
-# root -l -q -b applySelData.C"(\"$year\",\"$selection\",\"$selTrig\",\"$stripping\",\"\")"
-for i in {$event,$event+5}; do
-  mkdir -p /disk/data3/lhcb/phi/circleHT/$i
+
+
+#### Run Script ####
+echo Run Script with id: $event
+
+for i in $(seq -f "%04g" $event $(($event+1)))
+do
   python CircleDetection3Points.py $src_files/Event0000$i.txt
 done
 
 #log folder and stuff
-eventdir="/disk/data3/lhcb/phi/circleHT/log/Event$event_$event+5"
-mkdir -p $eventdir
+endnr=$(($event+5))
+numbering=${event}_${endnr}
+eventdir="/disk/data3/lhcb/phi/circleHT/log/Event"
+fullpath=${eventdir}${numbering}
+mkdir -p ${fullpath}
+echo $fullpath
 # Clean up
-cp /scratch/$USER/$PBS_JOBID $eventdir
-
+rm -rf /scratch/$USER/$PBS_JOBID/*.py*
+rm -rf /scratch/$USER/$PBS_JOBID/*.txt
+cp -rf /scratch/$USER/$PBS_JOBID/* $fullpath
+#
 rm -rf /scratch/$USER/$PBS_JOBID
