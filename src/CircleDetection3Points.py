@@ -8,7 +8,7 @@ import sys
 import itertools
 import pprint
 import pdb
-import pickle
+import cPickle as pickle
 import os
 
 import numpy as np
@@ -398,7 +398,7 @@ if __name__ == '__main__':
     found_circles = compareRings(entry, circles)
 
     pickle_data['foundRings'] = found_circles
-
+    pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
     print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
     plotData(x,y,circles,savePath=fileName)
 
