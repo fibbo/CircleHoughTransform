@@ -26,6 +26,11 @@ from timer import Timer
 
 NUMBER_OF_R_BINS = 1000 #bins for radius
 NUMBER_OF_S_BINS = 1000 #bins for space
+MAX_POINT_DISTANCE = 0.30
+MAX_CENTER_DISTANCE = 0.020
+MAX_RADIUS_DISTANCE = 0.005
+RADIUS_THRESHOLD = 120
+CENTER_THRESHOLD = 120
 VISUALISATION = True
 EVENTNUMBER = -1
 
@@ -105,15 +110,15 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
     c = np.linalg.norm( B - A )
     #maximum distance between 2 points on a circle is 2*r, we know r shouldn't be bigger than 0.15 so if 2
     #points are further apart this triple isn't interesting for us
-    max_distance = 0.3
-    if a > max_distance or b > max_distance or c > max_distance:
+    
+    if a > MAX_POINT_DISTANCE or b > MAX_POINT_DISTANCE or c > MAX_POINT_DISTANCE:
       continue
     s = ( a + b + c ) / 2
 
     R = a * b * c / 4 / np.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) )
     
     #maximum radius is 0.15 everything larger we forget
-    if R<0.15:
+    if R<MAX_POINT_DISTANCE/2:
       if onlyRadius:
         r.append(R)
       else: 
@@ -143,6 +148,7 @@ def main( combinationsList, n ):
   With the help of barycentric coordinates we calculate the radius and the center defined by each tuple of 3 points given as parameter
 
   @param: combinationsList: a list of all possible combinations of 3 points
+  @param int n: number of triples in combinationsList
   @returns: S_OK( resList ): resList is a list of dictionaries of possible circles.
 
   """
@@ -206,7 +212,7 @@ def extractRadius( radius_dict ):
     i = np.argmax(H)
     n = NUMBER_OF_R_BINS
     n_entries = sum(H[i-1 if i>0 else i:i+2 if i<n-1 else i+1])
-    if n_entries < 120:
+    if n_entries < RADIUS_THRESHOLD:
       # there are less than 200 entries in 3 bins
       break
 
@@ -257,7 +263,7 @@ def extractCenter( center_dict ):
     #             1x1 
     #              1
     n_entries =   sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j]) + sum(H[i, j-1 if j>0 else j:j+2 if j+2 <= 3 else j+1]) - H[i,j]
-    if n_entries < 120:
+    if n_entries < CENTER_THRESHOLD:
       break
 
     # Set the entries to 0 so they won't contribute twice
@@ -300,8 +306,8 @@ def removeFakes( results ):
     unique = True
 
     for dic in sorted_results:
-      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < 0.020 and\
-         (abs(circle['radius'] - dic['radius']) < 0.005):
+      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < MAX_CENTER_DISTANCE and\
+         (abs(circle['radius'] - dic['radius']) < MAX_RADIUS_DISTANCE):
         unique = False
     if unique:
       res.append(circle)
@@ -323,8 +329,8 @@ def compareRings( db_rings, results):
   # if 
   while len(results):
     result_ring = results.pop()
-    if any(abs(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center']))) < 0.010 and\
-           abs(result_ring['radius']-db_ring['radius']) < 0.005 for db_ring in db_rings):
+    if any(abs(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center']))) < MAX_CENTER_DISTANCE and\
+           abs(result_ring['radius']-db_ring['radius']) < MAX_RADIUS_DISTANCE for db_ring in db_rings):
       found_circles.append(result_ring)
     else:
       fake_circles.append(result_ring)
