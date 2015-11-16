@@ -416,5 +416,7 @@ if __name__ == '__main__':
     pickle_data['fakeRings'] = fake_circles
     pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
     print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
-    plotData(x,y,circles,savePath=EVENTNUMBER)
+    print "Algorithm found %s fake circles" % len(fake_circles)
+    plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
+    plotData(x,y,fake_circles,savePath=EVENTNUMBER+"_fakes.png")
 
