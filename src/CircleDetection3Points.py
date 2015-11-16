@@ -12,8 +12,6 @@ import cPickle as pickle
 import os
 
 import numpy as np
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import misc as sp
 from visualizeData import plotData, convertTuplesToList
