@@ -386,19 +386,26 @@ if __name__ == '__main__':
     fileName = 'tttt.png'
   pp = pprint.PrettyPrinter(depth=6)
   x,y = convertTuplesToList(data['allPoints'])
+  
+  # Pickle dictionary where we store the results 
+  pickle_data = {}
+
   totalTime = 0
   with Timer() as t:
     combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
   print "Time for creating triple list: %ss" % t.secs
+  pickle_data['combTime'] = t.secs
+
   totalTime += t.secs
+  
   with Timer() as t:
     res = main( combinationsList, n=len(data['allPoints']) )
   print "Time for main algorithm: %ss" % t.secs
-  totalTime += t.secs
+  pickle_data['mainTime'] = t.secs
   
-  # Pickle dictionary where we store the results 
-  pickle_data = {}
+  totalTime += t.secs
   pickle_data['Runtime'] = totalTime
+  
   pickle_data['numberOfTriples'] = len(data['allPoints'])
 
   if res['OK']:
