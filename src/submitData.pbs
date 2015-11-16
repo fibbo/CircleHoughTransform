@@ -1,36 +1,44 @@
 # File script to run circle detection algorithm 
 
-# create folders
+# Create temporary job folder
 mkdir -p /scratch/$USER/$PBS_JOBID
 
+# Copy all the necessary files to the temporary job folder
 cp $HOME/CircleHoughTransform/src/*.py /scratch/$USER/$PBS_JOBID/
 cp $HOME/CircleHoughTransform/src/600_bg_r.txt /scratch/$USER/$PBS_JOBID/
 cp $HOME/CircleHoughTransform/src/db.pkl /scratch/$USER/$PBS_JOBID/
 cd /scratch/$USER/$PBS_JOBID
-
 
 # Setting path for event source files
 src_files="/disk/data1/hep/che/HoughTransform/serie0/files"
 
 
 #### Run Script ####
-echo Run Script with id: $event
-
-for i in $(seq -f "%04g" $event $(($event+1)))
+# $event is the number of the run without leading zeros. Converting it to a
+# number with leading zeros so we can call the source file with it.
+# %04g: 0 - Left-pads the number with zeros instead of spaces when padding
+#           is specified
+#       4 - Width: minimum numbers of characters to be printed
+#       g - Default format: float or something
+for i in $(seq -f "%04g" $event $(($event+9)))
 do
   python CircleDetection3Points.py $src_files/Event0000$i.txt
 done
 
-#log folder and stuff
-endnr=$(($event+5))
+# Create log folder. Since we run several source files with one job we put
+# all teh results in one folder naming the folder Event_StartNumber_Endnumber
+endnr=$(($event+9))
 numbering=${event}_${endnr}
-eventdir="/disk/data3/lhcb/phi/circleHT/log/Event"
-fullpath=${eventdir}${numbering}
+eventdir="/disk/data3/lhcb/phi/circleHT/Event"
+fullpath=${eventdir}_${numbering}
 mkdir -p ${fullpath}
 echo $fullpath
 # Clean up
+# Removing all python and txt files from the scratch folder
 rm -rf /scratch/$USER/$PBS_JOBID/*.py*
 rm -rf /scratch/$USER/$PBS_JOBID/*.txt
+# Copy the remaining files to the event folder
 cp -rf /scratch/$USER/$PBS_JOBID/* $fullpath
-#
+
+# Remove scratch folder
 rm -rf /scratch/$USER/$PBS_JOBID
