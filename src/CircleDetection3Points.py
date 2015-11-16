@@ -321,11 +321,15 @@ def compareRings( db_rings, results):
   missed_circles = []
   fake_circles = []
   # if 
-  for result_ring in results:
-    if any(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center'])) < 0.010 and abs(result_ring['radius']-db_ring['radius']) < 0.005 for db_ring in db_rings):
+  while len(results):
+    result_ring = results.pop()
+    if any(abs(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center']))) < 0.010 and\
+           abs(result_ring['radius']-db_ring['radius']) < 0.005 for db_ring in db_rings):
       found_circles.append(result_ring)
+    else:
+      fake_circles.append(result_ring)
 
-  return found_circles
+  return found_circles, fake_circles
 
 
 def visualizeCenterHistogram( x,y, bins=NUMBER_OF_S_BINS ):
@@ -378,27 +382,41 @@ if __name__ == '__main__':
     fileName = 'tttt.png'
   pp = pprint.PrettyPrinter(depth=6)
   x,y = convertTuplesToList(data['allPoints'])
+  totalTime = 0
   with Timer() as t:
     combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
   print "Time for creating triple list: %ss" % t.secs
+  totalTime += t.secs
   with Timer() as t:
     res = main( combinationsList, n=len(data['allPoints']) )
   print "Time for main algorithm: %ss" % t.secs
+  totalTime += t.secs
+  
+  # Pickle dictionary where we store the results 
+  pickle_data = {}
+  pickle_data['Runtime'] = totalTime
+  pickle_data['numberOfTriples'] = len(data['allPoints'])
+
   if res['OK']:
     res = res['Value']
 
-    pickle_data = {}
     pickle_data['allRings'] = res
+
+    # removing double entries
     circles = removeFakes(res)
 
+    # only unique rings left
     pickle_data['noDupRings'] = circles
 
+
+    # now we compare the algorithm results with the real data
     db = openDB()
     entry = db[int(EVENTNUMBER)]['rings']
-    found_circles = compareRings(entry, circles)
+    found_circles, fake_circles = compareRings(entry, circles)
 
     pickle_data['foundRings'] = found_circles
+    pickle_data['fakeRings'] = fake_circles
     pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
     print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
-    plotData(x,y,circles,savePath=fileName)
+    plotData(x,y,circles,savePath=EVENTNUMBER)
 
