@@ -362,7 +362,7 @@ def openDB():
   """ Open the pickel database. Has all the information of the simulated data
 
   """
-  f = open('../db.pkl')
+  f = open('db.pkl')
   db = pickle.load(f)
   return db
 
