@@ -390,6 +390,11 @@ if __name__ == '__main__':
   # Pickle dictionary where we store the results 
   pickle_data = {}
 
+  pickle_data['Parameters'] = { "MAX_RADIUS_DISTANCE" : MAX_RADIUS_DISTANCE, "MAX_CENTER_DISTANCE" : MAX_CENTER_DISTANCE,\
+                                "MAX_POINT_DISTANCE" : MAX_POINT_DISTANCE, "RADIUS_THRESHOLD" : RADIUS_THRESHOLD,\
+                                "CENTER_THRESHOLD" : CENTER_THRESHOLD, "NUMBER_OF_S_BINS" : NUMBER_OF_S_BINS,\
+                                "NUMBER_OF_R_BINS" : NUMBER_OF_R_BINS }
+
   totalTime = 0
   with Timer() as t:
     combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
@@ -406,7 +411,7 @@ if __name__ == '__main__':
   totalTime += t.secs
   pickle_data['Runtime'] = totalTime
   
-  pickle_data['numberOfTriples'] = len(data['allPoints'])
+  pickle_data['nPoints'] = len(data['allPoints'])
 
   if res['OK']:
     res = res['Value']
@@ -415,10 +420,6 @@ if __name__ == '__main__':
 
     # removing double entries
     circles = removeFakes(res)
-
-    # only unique rings left
-    pickle_data['noDupRings'] = circles
-
 
     # now we compare the algorithm results with the real data
     db = openDB()
