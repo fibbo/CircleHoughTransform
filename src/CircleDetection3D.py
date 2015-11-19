@@ -5,7 +5,7 @@ import scipy.constants as sconst
 import numpy as np
 import sys
 import time
-
+import pdb
 
 from Tools import readFile
 
@@ -15,32 +15,33 @@ def inverseWeight( weight_matrix, radius, x, y, data ):
   return weight_matrix
 
 def gaussWeight( weight_matrix, r, x, y, data ):
-  for x0, y0 in zip( data['x'], data['y'] ):
+  for x0, y0 in data['allPoints']:
     s = 2 * data['bin_width']
     eta = ( x - x0 ) ** 2 + ( y - y0 ) ** 2 - r ** 2
     weight_matrix += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 ) / ( 2 * s ** 2 ) )
   return weight_matrix
 
-def visualize( data ):
+def visualize( data, raw=False ):
   """ Visualizing the data. First a scatter plot of the simulated data then the circles found by the algorithm.
       for comparison the real circles are plotted as well
 
       :param dict data. data holds all the information
   """
-  plt.ylim( -2, 1 )
-  plt.xlim( -2, 1 )
-  plt.scatter( data['x'], data['y'] )
+  plt.ylim( -0.5, 0.5 )
+  plt.xlim( -0.5, 0.5 )
+  x,y = zip(*data['allPoints'])
+  plt.scatter( x, y )
   fig = plt.gcf()
+  if not raw:
+    colors = ['red', 'blue', 'green', 'yellow', 'purple']
+    print 'Number of circles found %s' % len( data['CenterCalc'] )
+    for c, r in zip( data['CenterCalc'], data['RadiusCalc'] ):
+      fig.gca().add_artist( plt.Circle( ( c[0], c[1] ), r, fill = False, color = 'grey' ) )
 
-  colors = ['red', 'blue', 'green', 'yellow', 'purple']
-  print 'Number of circles found %s' % len( data['CenterCalc'] )
-  for c, r in zip( data['CenterCalc'], data['RadiusCalc'] ):
-    fig.gca().add_artist( plt.Circle( ( c[0], c[1] ), r, fill = False, color = 'grey' ) )
-
-  i = 0
-  for c1, c2 in data['Center']:
-    fig.gca().add_artist( plt.Circle( ( c1, c2 ), data['Radius'][i], fill = False, color = colors[i] ) )
-    i += 1
+    i = 0
+    for c1, c2 in data['Center']:
+      fig.gca().add_artist( plt.Circle( ( c1, c2 ), data['Radius'][i], fill = False, color = colors[i] ) )
+      i += 1
 
   plt.show()
 
@@ -62,10 +63,10 @@ def findCircles( data, weight_function, space_dim = 100, r_dim = 100 ):
   """
   centers = []
   radius = []
-  xmin = -1.0
-  xmax = 1.0
-  ymin = -1.0
-  ymax = 1.0
+  xmin = -0.5
+  xmax = 0.5
+  ymin = -0.5
+  ymax = 0.5
   rmin = 0.0
   rmax = 1
   # divide the x and y axis in [steps] equal parts from 0 to 1
@@ -84,8 +85,8 @@ def findCircles( data, weight_function, space_dim = 100, r_dim = 100 ):
   data['CenterCalc'] = centers
   data['RadiusCalc'] = radius
   x, y, r = np.broadcast_arrays( xbins[..., np.newaxis, np.newaxis], ybins[np.newaxis, ..., np.newaxis], rbins[np.newaxis, np.newaxis, ...] )
-  max_value = 140
-  while max_value >= 140:
+  max_value = 999
+  while max_value >= 400:
     w = np.zeros( ( space_dim, space_dim, r_dim ) )
     w = weight_function( w, r, x, y, data )
     center, rad, max_value = findCenter( w, data )
@@ -102,16 +103,16 @@ def removePoints( center, data, r ):
 
   """
   i = 0
-  used_x = []
-  used_y = []
-  for x0, y0 in zip( data['x'], data['y'] ):
+  used_xy = []
+  for x0, y0 in data['allPoints']:
     if ( abs( ( x0 - center[0] ) ** 2 + ( y0 - center[1] ) ** 2 - r ** 2 ) ) < 2 * data['bin_width']:
-      used_x.append( data['x'].pop( i ) )
-      used_y.append( data['y'].pop( i ) )
+      # used_x.append( data['x'].pop( i ) )
+      # used_y.append( data['y'].pop( i ) )
+      used_xy.append(data['allPoints'].pop(i))
     else:
       i += 1
 
-  return zip( used_x, used_y )
+  return used_xy
 
 def findCenter( w, data, neighbor_weights = False, weight_factor = 0.5 ):
   """ Goes through the weight matrix and finds the highest value or the highest cluster of values.
@@ -141,25 +142,22 @@ if __name__ == '__main__':
     sys.exit( 'please provide file to be read' )
   path = sys.argv[1]
   data = readFile( path )
-
+  # visualize(data, raw=True)
   # saving the data points since some points get removed in  the algorithm
 
-  x, y = list( data['x'] ), list( data['y'] )
+  x, y = zip(*data['allPoints'])
   # shuffle the order the radiuses - algorithm shouldnt depend on the order
   # which it does at the moment - also shuffling the centers with the radiuses
   # or during the visualisation wrong centers get match with wrong radiuses
   combined = zip( data['Center'], data['Radius'], data['nPoints'] )
   combined = sorted( combined, key = lambda x: x[2], reverse = True )
 
-  data['Center'][:], data['Radius'][:], data['nPoints'] = zip( *combined )
 
-#### run specific methods ####
-  start_time = time.time()
-  findCircles( data, gaussWeight, space_dim = 2000, r_dim = 100 )
+  findCircles( data, gaussWeight, space_dim = 400, r_dim = 100 )
 
   # restore initial data points so the plot includes all data points (noise included)
-  # data['x'], data['y'] = x, y
-  print time.time() - start_time
+  data['allPoints'] = zip(x,y)
+
   visualize( data )
 
 
