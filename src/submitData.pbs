@@ -9,6 +9,7 @@ cp $HOME/CircleHoughTransform/src/600_bg_r.txt /scratch/$USER/$PBS_JOBID/
 cp $HOME/CircleHoughTransform/src/db.pkl /scratch/$USER/$PBS_JOBID/
 cd /scratch/$USER/$PBS_JOBID
 
+
 # Setting path for event source files
 src_files="/disk/data1/hep/che/HoughTransform/serie0/files"
 
@@ -22,7 +23,7 @@ src_files="/disk/data1/hep/che/HoughTransform/serie0/files"
 #       g - Default format: float or something
 for i in $(seq -f "%04g" $event $(($event+9)))
 do
-  echo python CircleDetection3Points.py $src_files/Event0000$i.txt
+  python CircleDetection3Points.py $src_files/Event0000$i.txt
 done
 
 # Create log folder. Since we run several source files with one job we put
@@ -30,12 +31,11 @@ done
 endnr=$(printf "%04d" $(($event+9)))
 event=$(printf "%04d" $event)
 numbering=${event}_${endnr}
-echo $numbering
 
 eventdir="/disk/data3/lhcb/phi/circleHT/Event"
 fullpath=${eventdir}_${numbering}
 mkdir -p ${fullpath}
-echo $fullpath
+
 # Clean up
 # Removing all python and txt files from the scratch folder
 rm -rf /scratch/$USER/$PBS_JOBID/*.py*
