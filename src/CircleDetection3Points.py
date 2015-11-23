@@ -10,6 +10,7 @@ import pprint
 import pdb
 import cPickle as pickle
 import os
+import multiprocessing as mp
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -89,7 +90,7 @@ def SHistogram(data, number_of_bins, hrange=None):
   return S_OK( (n, bins, data_array) )
 
 
-def calculateCircleFromPoints(combinationsList, onlyRadius=False):
+def calculateCircleFromPoints(points, output, onlyRadius=False):
   """ Calculate the circle from 3 given points. Discard points that are further than 0.3 apart. Discard points that create a
   Circle with a radius larger than 0.15.
 
@@ -130,8 +131,8 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
         P /= lambda1 + lambda2 + lambda3
         xy.append( (P[0],P[1]) )
         r.append(R)
+  output.put((xy,r))
 
-  return xy, r
 
 def fullCenterHistogram( xy, bins=NUMBER_OF_S_BINS ):
   x,y = zip(*xy)
@@ -150,8 +151,30 @@ def main( combinationsList, n ):
   @returns: S_OK( resList ): resList is a list of dictionaries of possible circles.
 
   """
+  output = mp.Queue()
+  N = 5
+  processes = [mp.Process(target=calculateCircleFromPoints, args=(combinationsList[(i-1)*len(combinationsList)/(N-1):\
+                                                                                    i*len(combinationsList)/(N-1)],output))\
+                                                                                    for i in range(1,N)]
 
-  xy, r = calculateCircleFromPoints( combinationsList )
+  print "starting processes"
+  for p in processes:
+    p.start()
+  # p.start()
+
+
+  print "getting results"
+  # # Get process results from the output queue
+  results = [output.get for p in processes]
+
+  r = []
+  xy = []
+  for result in results:
+    res = result()
+    r += res[1]
+    xy += res[0]
+
+  #xy, r = calculateCircleFromPoints( combinationsList )
   #fullCenterHistogram( xy )
   data = zip(r, xy)
   dtype = [('radius', float), ('center', tuple)]
