@@ -150,8 +150,12 @@ def main( combinationsList, n ):
   @returns: S_OK( resList ): resList is a list of dictionaries of possible circles.
 
   """
-
-  xy, r = calculateCircleFromPoints( combinationsList )
+  xy, r = [], []
+  for combList in combinationsList:
+    xy_t, r_t = calculateCircleFromPoints( combList )
+    xy += xy_t
+    r += r_t
+  
   #fullCenterHistogram( xy )
   data = zip(r, xy)
   dtype = [('radius', float), ('center', tuple)]
@@ -397,7 +401,7 @@ if __name__ == '__main__':
 
   totalTime = 0
   with Timer() as t:
-    combinationsList =   list( itertools.combinations( data['allPoints'], 3 ) )
+    combinationsList =   [list( itertools.combinations( data['allPoints'][i-1:i*len(data['allPoints'])/2], 3 ) ) for i in range(1,3) ]
   print "Time for creating triple list: %ss" % t.secs
   pickle_data['combTime'] = t.secs
 
