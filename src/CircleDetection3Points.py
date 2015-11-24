@@ -152,7 +152,7 @@ def main( combinationsList, n ):
 
   """
   output = mp.Queue()
-  N = 5
+  N = 2
   processes = [mp.Process(target=calculateCircleFromPoints, args=(combinationsList[(i-1)*len(combinationsList)/(N-1):\
                                                                                     i*len(combinationsList)/(N-1)],output))\
                                                                                     for i in range(1,N)]
