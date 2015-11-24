@@ -401,7 +401,7 @@ if __name__ == '__main__':
 
   totalTime = 0
   with Timer() as t:
-    combinationsList =   [list( itertools.combinations( data['allPoints'][i-1:i*len(data['allPoints'])/2], 3 ) ) for i in range(1,3) ]
+    combinationsList =   [list( itertools.combinations( data['allPoints'][i-1:i*len(data['allPoints'])/2], 3 ) ) for i in [1,2] ]
   print "Time for creating triple list: %ss" % t.secs
   pickle_data['combTime'] = t.secs
 
