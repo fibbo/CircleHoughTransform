@@ -1,3 +1,4 @@
+echo Start Job at `date`
 # File script to run circle detection algorithm 
 
 # Create temporary job folder
@@ -26,13 +27,15 @@ do
   python CircleDetection3Points.py $src_files/Event0000$i.txt
 done
 
+echo End job at `date`
+
 # Create log folder. Since we run several source files with one job we put
 # all teh results in one folder naming the folder Event_StartNumber_Endnumber
 endnr=$(printf "%04d" $(($event+9)))
 event=$(printf "%04d" $event)
 numbering=${event}_${endnr}
 
-eventdir="/disk/data3/lhcb/phi/circleHT/Event"
+eventdir="/disk/data3/lhcb/phi/circleHT/run02/Event"
 fullpath=${eventdir}_${numbering}
 mkdir -p ${fullpath}
 
@@ -40,6 +43,7 @@ mkdir -p ${fullpath}
 # Removing all python and txt files from the scratch folder
 rm -rf /scratch/$USER/$PBS_JOBID/*.py*
 rm -rf /scratch/$USER/$PBS_JOBID/*.txt
+rm /scratch/$USER/$PBS_JOBID/db.pkl
 # Copy the remaining files to the event folder
 cp -rf /scratch/$USER/$PBS_JOBID/* $fullpath
 
