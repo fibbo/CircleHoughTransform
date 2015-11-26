@@ -16,6 +16,7 @@ Circle.sublime-project
 *.sublime-workspace
 *.bcf
 *.blg
+*.png
 *.fls
 *.run.xml
 *.bbl
