@@ -19,6 +19,7 @@ Circle.sublime-project
 *.fls
 *.run.xml
 *.bbl
+*.png
 /img
 /data
 /serie0
