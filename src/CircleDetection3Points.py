@@ -12,9 +12,8 @@ import cPickle as pickle
 import os
 
 import numpy as np
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import matplotlib as plt
+plt.use("Agg")
 from scipy import misc as sp
 from visualizeData import plotData, convertTuplesToList
 from artificial_circle import generateCircle
@@ -27,8 +26,8 @@ from timer import Timer
 NUMBER_OF_R_BINS = 1000 #bins for radius
 NUMBER_OF_S_BINS = 1000 #bins for space
 MAX_POINT_DISTANCE = 0.30
-MAX_CENTER_DISTANCE = 0.025
-MAX_RADIUS_DISTANCE = 0.010
+MAX_CENTER_DISTANCE = 0.035
+MAX_RADIUS_DISTANCE = 0.020
 RADIUS_THRESHOLD = 120
 CENTER_THRESHOLD = 120
 VISUALISATION = True
@@ -295,7 +294,7 @@ def backgroundHistogram( filename ):
   bkgHistogram, edges = np.histogram(r, NUMBER_OF_R_BINS, [0,2])
   return bkgHistogram, edges
   
-def removeFakes( results ):
+def removeDuplicates( results ):
   """ 
 
   """
@@ -421,7 +420,8 @@ if __name__ == '__main__':
     pickle_data['allRings'] = res
 
     # removing double entries
-    circles = removeFakes(res)
+    circles = removeDuplicates(res)
+
 
     # now we compare the algorithm results with the real data
     db = openDB()
@@ -436,4 +436,5 @@ if __name__ == '__main__':
     plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
     if len(fake_circles):
       plotData(x,y,fake_circles,savePath=EVENTNUMBER+"_fakes.png")
+      plotData(x,y,circles,savePath=EVENTNUMBER+"_allCircles.png")
 

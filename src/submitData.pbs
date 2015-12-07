@@ -35,7 +35,7 @@ endnr=$(printf "%04d" $(($event+9)))
 event=$(printf "%04d" $event)
 numbering=${event}_${endnr}
 
-eventdir="/disk/data3/lhcb/phi/circleHT/run02/Event"
+eventdir="/disk/data3/lhcb/phi/circleHT/run04/Event"
 fullpath=${eventdir}_${numbering}
 mkdir -p ${fullpath}
 
@@ -43,7 +43,7 @@ mkdir -p ${fullpath}
 # Removing all python and txt files from the scratch folder
 rm -rf /scratch/$USER/$PBS_JOBID/*.py*
 rm -rf /scratch/$USER/$PBS_JOBID/*.txt
-rm /scratch/$USER/$PBS_JOBID/db.pkl
+rm -rf /scratch/$USER/$PBS_JOBID/db.pkl
 # Copy the remaining files to the event folder
 cp -rf /scratch/$USER/$PBS_JOBID/* $fullpath
 
