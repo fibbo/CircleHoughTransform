@@ -12,8 +12,9 @@ import cPickle as pickle
 import os
 
 import numpy as np
-import matplotlib as plt
-plt.use("Agg")
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from scipy import misc as sp
 from visualizeData import plotData, convertTuplesToList
 from artificial_circle import generateCircle
