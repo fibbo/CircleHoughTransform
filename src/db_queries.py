@@ -3,7 +3,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-f = open('../db.pkl')
+f = open('db.pkl')
 
 db = pickle.load(f)
 
@@ -82,6 +82,6 @@ maxPoints( db )
 #ringsPerEventDistribution( db )
 #pointsPerCircleDistribution(db)
 #print findDataWithXCircles(db, 4)
-getCircleData( db, 9999)
+#getCircleData( db, 9999)
 # print findCircleWithLeastPoints(db)
 #print findMaxRadius( db )

@@ -22,14 +22,14 @@ from timer import Timer
 
 
 
-NUMBER_OF_R_BINS = 1000 #bins for radius
-NUMBER_OF_S_BINS = 1000 #bins for space
-MAX_POINT_DISTANCE = 0.30
-MAX_CENTER_DISTANCE = 0.020
-MAX_RADIUS_DISTANCE = 0.005
-RADIUS_THRESHOLD = 120
-CENTER_THRESHOLD = 120
-VISUALISATION = True
+NUMBER_OF_R_BINS = 1000 # bins for radius
+NUMBER_OF_S_BINS = 1000 # bins for space
+MAX_POINT_DISTANCE = 0.30 # maximum distance between two points
+MAX_CENTER_DISTANCE = 0.020 # maximum center distance for 2 centers to be considered equal
+MAX_RADIUS_DISTANCE = 0.005 # maximum radius distance for 2 radiuses to be considered equal
+RADIUS_THRESHOLD = 80 # radius threshold for qualifying as a potential circle
+CENTER_THRESHOLD = 80 # center threshold for qualifying as a potential circle
+VISUALISATION = True 
 EVENTNUMBER = -1
 
 def SHistogram(data, number_of_bins, hrange=None):
@@ -150,11 +150,8 @@ def main( combinationsList, n ):
   @returns: S_OK( resList ): resList is a list of dictionaries of possible circles.
 
   """
-  xy, r = [], []
-  for combList in combinationsList:
-    xy_t, r_t = calculateCircleFromPoints( combList )
-    xy += xy_t
-    r += r_t
+  print len(combinationsList)
+  xy, r = calculateCircleFromPoints( combinationsList )
   
   #fullCenterHistogram( xy )
   data = zip(r, xy)
@@ -167,12 +164,12 @@ def main( combinationsList, n ):
   radius_histogram, edges,  center_data = res['Value']
 
   # create a background histogram
-  factor = sp.comb(600,3)/sp.comb(n,3)
-  bkgHistogram = np.loadtxt('600_bg_r.txt')
-  bkgHistogram /= factor
+  # factor = sp.comb(600,3)/sp.comb(n,3)
+  # bkgHistogram = np.loadtxt('600_bg_r.txt')
+  # bkgHistogram /= factor
 
   radius = {}
-  radius['H'] = radius_histogram - bkgHistogram
+  radius['H'] = radius_histogram #- bkgHistogram
   radius['xedges'] = edges
   radius['center_data'] = center_data
 
@@ -400,13 +397,14 @@ if __name__ == '__main__':
                                 "NUMBER_OF_R_BINS" : NUMBER_OF_R_BINS }
 
   totalTime = 0
+  combinationsList = []
   with Timer() as t:
-    combinationsList =   [list( itertools.combinations( data['allPoints'][i-1:i*len(data['allPoints'])/2], 3 ) ) for i in [1,2] ]
+    combinationsList +=   list(itertools.combinations( data['allPoints'][:len(data['allPoints'])/2], 3 ) )
+    combinationsList +=   list(itertools.combinations( data['allPoints'][len(data['allPoints'])/2:], 3 ) ) 
   print "Time for creating triple list: %ss" % t.secs
   pickle_data['combTime'] = t.secs
 
   totalTime += t.secs
-  
   with Timer() as t:
     res = main( combinationsList, n=len(data['allPoints']) )
   print "Time for main algorithm: %ss" % t.secs
@@ -438,4 +436,4 @@ if __name__ == '__main__':
     plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
     if len(fake_circles):
       plotData(x,y,fake_circles,savePath=EVENTNUMBER+"_fakes.png")
-
+      plotData(x,y,circles, savePath=EVENTNUMBER+"_allCircles.png")
