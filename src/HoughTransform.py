@@ -1,5 +1,7 @@
 # default python imports
 from math import cos, sin, sqrt
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import scipy.constants as sconst
 import numpy as np

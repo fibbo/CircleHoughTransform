@@ -22,7 +22,8 @@ src_files="/disk/data1/hep/che/HoughTransform/serie0/files"
 #           is specified
 #       4 - Width: minimum numbers of characters to be printed
 #       g - Default format: float or something
-for i in $(seq -f "%04g" $event $(($event+9)))
+fpj=$($files_per_job-1)
+for i in $(seq -f "%04g" $event $(($event+$fpj)))
 do
   python CircleDetection3Points.py $src_files/Event0000$i.txt
 done
@@ -31,7 +32,7 @@ echo End job at `date`
 
 # Create log folder. Since we run several source files with one job we put
 # all teh results in one folder naming the folder Event_StartNumber_Endnumber
-endnr=$(printf "%04d" $(($event+9)))
+endnr=$(printf "%04d" $(($event+$fpj)))
 event=$(printf "%04d" $event)
 numbering=${event}_${endnr}
 
