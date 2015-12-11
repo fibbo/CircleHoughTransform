@@ -15,12 +15,12 @@ from Tools import *
 
 def HoughTransform( data ):
 
-  histograms = createHistograms( data )
-  radiuses = findRadiusClusters( histograms )
+  listOfHistograms = createHistograms( data )
+  listOfRadiuses = findRadiusClusters( listOfHistograms )
   plt.scatter( data['x'], data['y'] )
   # import pdb; pdb.set_trace()
   fig = plt.gcf()
-  for radius in radiuses:
+  for radius in listOfRadiuses:
     if not radius['Radius']:
       continue
 
@@ -169,7 +169,6 @@ def gaussWeight( weight_matrix, radius, x, y, data ):
     weight_matrix += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 ) / ( 2 * s ** 2 ) )
   return weight_matrix
 
-
 def calculateWeights( data, weight_function, dim = 100 ):
   """ We create a histogram from xmin to xmax and ymin to ymax and calculate then the distances from the grid
       points to the input points. if a grid point has the same distance to several input points it could be that
@@ -209,10 +208,10 @@ def visualize( data ):
 
   plt.scatter( data['x'], data['y'] )
   fig = plt.gcf()
-#   ax1 = plt.subplot( 1, 1, 1 )
-#   x0, x1 = ax1.get_xlim()
-#   y0, y1 = ax1.get_ylim()
-#   print ax1
+  # ax1 = plt.subplot( 1, 1, 1 )
+  # x0, x1 = ax1.get_xlim()
+  # y0, y1 = ax1.get_ylim()
+  # print ax1
   colors = ['red', 'blue', 'green', 'yellow', 'purple']
 
   for c, r in zip( data['CalcCenter'], data['Radius'] ):
