@@ -35,7 +35,12 @@ def bulk():
       numberOfTotalRings += len(db_rings)
       while (len(db_rings)):
         dbring = db_rings.pop()
+<<<<<<< HEAD
         if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.010 and abs(dbring['radius'] - ring['radius']) < 0.005 for ring in res['foundRings']):
+=======
+        if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.25 and abs(dbring['radius'] - ring['radius']) < 0.10\
+         for ring in res['foundRings']):
+>>>>>>> origin/split_data
           duplicateRings.append(dbring)
   print "number of missed rings: %s" % numberOfMissedRings
   print "number of fake rings: %s" % numberOfFakeRings
