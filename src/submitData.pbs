@@ -22,7 +22,7 @@ src_files="/disk/data1/hep/che/HoughTransform/serie0/files"
 #           is specified
 #       4 - Width: minimum numbers of characters to be printed
 #       g - Default format: float or something
-fpj=$($files_per_job-1)
+fpj=$(($files_per_job-1))
 for i in $(seq -f "%04g" $event $(($event+$fpj)))
 do
   python CircleDetection3Points.py $src_files/Event0000$i.txt
@@ -36,7 +36,7 @@ endnr=$(printf "%04d" $(($event+$fpj)))
 event=$(printf "%04d" $event)
 numbering=${event}_${endnr}
 
-eventdir="/disk/data3/lhcb/phi/circleHT/splitData/run01/Event"
+eventdir="/disk/data3/lhcb/phi/circleHT/splitData/run02/Event"
 fullpath=${eventdir}_${numbering}
 mkdir -p ${fullpath}
 
