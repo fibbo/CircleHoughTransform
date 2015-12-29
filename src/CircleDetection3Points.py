@@ -414,7 +414,7 @@ if __name__ == '__main__':
 
     # removing double entries
     circles = removeFakes(res)
-
+    pdb.set_trace()
     # now we compare the algorithm results with the real data
     db = openDB()
     entry = db[int(EVENTNUMBER)]['rings']
