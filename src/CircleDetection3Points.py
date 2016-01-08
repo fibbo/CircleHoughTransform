@@ -13,7 +13,7 @@ import os
 
 import numpy as np
 import matplotlib
-matplotlib.use("Agg")
+#matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import misc as sp
 from visualizeData import plotData, convertTuplesToList
@@ -142,7 +142,6 @@ def main( combinationsList, n ):
   @returns: S_OK( resList ): resList is a list of dictionaries of possible circles.
 
   """
-  print len(combinationsList)
   xy, r = calculateCircleFromPoints( combinationsList )
   
   #fullCenterHistogram( xy )
@@ -156,16 +155,16 @@ def main( combinationsList, n ):
   radius_histogram, edges,  center_data = res['Value']
 
   # create a background histogram
-  # factor = sp.comb(600,3)/sp.comb(n,3)
-  # bkgHistogram = np.loadtxt('600_bg_r.txt')
-  # bkgHistogram /= factor
+  factor = sp.comb(600,3)/sp.comb(n,3)
+  bkgHistogram = np.loadtxt('600_bg_r.txt')
+  bkgHistogram /= factor
 
   radius = {}
   radius['H'] = radius_histogram #- bkgHistogram
   radius['xedges'] = edges
   radius['center_data'] = center_data
 
-  #visualizeRadiusHistogram(radius)
+  visualizeRadiusHistogram(radius)
 
   radiuses, center_data = extractRadius(radius)
 
@@ -369,15 +368,18 @@ if __name__ == '__main__':
   #### read data #####
   if len( sys.argv ) == 2:
     path = sys.argv[1]
-    data = readFile( path )  
-    EVENTNUMBER = sys.argv[1][-8:-4]
-    fileName = sys.argv[1][-12:-4]+".png"
+    data = readFile( path )
+    if path.startswith('Event'):
+      EVENTNUMBER = sys.argv[1][-8:-4]
+      fileName = sys.argv[1][-12:-4]+".png"
+    else:
+      EVENTNUMBER = None
   else:
     data = {}
     res = generateCircle(0.12, (0,0), background=100)
     data['allPoints'] = res
     fileName = 'tttt.png'
-  pp = pprint.PrettyPrinter(depth=6)
+
   x,y = convertTuplesToList(data['allPoints'])
   
   # Pickle dictionary where we store the results 
@@ -390,11 +392,17 @@ if __name__ == '__main__':
 
   totalTime = 0
   combinationsList = []
-  with Timer() as t:
-    combinationsList +=   list(itertools.combinations( data['allPoints'][:len(data['allPoints'])/2], 3 ) )
-    combinationsList +=   list(itertools.combinations( data['allPoints'][len(data['allPoints'])/2:], 3 ) ) 
-  print "Time for creating triple list: %ss" % t.secs
-  pickle_data['combTime'] = t.secs
+  if len(data['allPoints']) > 350:
+    with Timer() as t:
+      combinationsList +=   list(itertools.combinations( data['allPoints'][:len(data['allPoints'])/2], 3 ) )
+      combinationsList +=   list(itertools.combinations( data['allPoints'][len(data['allPoints'])/2:], 3 ) ) 
+    print "Time for creating triple list: %ss" % t.secs
+    pickle_data['combTime'] = t.secs
+  else:
+    with Timer() as t:
+      combinationsList = list(itertools.combinations( data['allPoints'], 3))
+    print "Time for creating triple list: %ss" % t.secs
+    pickle_data['combTime'] = t.secs
 
   totalTime += t.secs
   with Timer() as t:
@@ -417,15 +425,18 @@ if __name__ == '__main__':
 
     # now we compare the algorithm results with the real data
     db = openDB()
-    entry = db[int(EVENTNUMBER)]['rings']
-    found_circles, fake_circles = compareRings(entry, circles)
+    if EVENTNUMBER:
+      entry = db[int(EVENTNUMBER)]['rings']
+      found_circles, fake_circles = compareRings(entry, circles)
 
-    pickle_data['foundRings'] = found_circles
-    pickle_data['fakeRings'] = fake_circles
-    pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
-    print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
-    print "Algorithm found %s fake circles" % len(fake_circles)
-    plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
-    if len(fake_circles):
-      plotData(x,y,fake_circles,savePath=EVENTNUMBER+"_fakes.png")
-      plotData(x,y,circles, savePath=EVENTNUMBER+"_allCircles.png")
+      pickle_data['foundRings'] = found_circles
+      pickle_data['fakeRings'] = fake_circles
+      pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
+      print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
+      print "Algorithm found %s fake circles" % len(fake_circles)
+      plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
+      if len(fake_circles):
+        plotData(x,y,fake_circles,savePath=EVENTNUMBER+"_fakes.png")
+        plotData(x,y,circles, savePath=EVENTNUMBER+"_allCircles.png")
+    else:
+      plotData(x,y, circles)

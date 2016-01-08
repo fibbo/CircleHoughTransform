@@ -36,6 +36,7 @@ def plotData( x,y, circles, savePath=None ):
   if savePath:
     fig.savefig(savePath)
   plt.show()
+  
 
 if __name__ == '__main__': 
   #### read data #####

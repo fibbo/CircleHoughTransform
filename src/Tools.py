@@ -58,17 +58,12 @@ def readFile( filename ):
     if not line.startswith( '#' ):
         sep = line.split()
         allPoints.append( np.array( [float( sep[1] ), float( sep[2] ) ] ) )
-    if 'Center' in line:
-      sep = line.split()
-      #tmp = literal_eval( sep[8] )
-      #center.append( tmp )
-
     if 'Radius' in line:
       sep = line.split()
       radius.append( float( sep[6] ) )
     if 'Center' in line:
       sep = line.split()
-      nPoints.append( float( sep[3] ) )
+      center.append( np.array( (float( sep[9] ), float( sep[11] )) ) )
 
   return { 'allPoints' : allPoints, 'Center' : center, 'Radius' : radius, 'nPoints' : nPoints }
 
