@@ -35,12 +35,8 @@ def bulk():
       numberOfTotalRings += len(db_rings)
       while (len(db_rings)):
         dbring = db_rings.pop()
-<<<<<<< HEAD
-        if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.010 and abs(dbring['radius'] - ring['radius']) < 0.005 for ring in res['foundRings']):
-=======
         if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.25 and abs(dbring['radius'] - ring['radius']) < 0.10\
          for ring in res['foundRings']):
->>>>>>> origin/split_data
           duplicateRings.append(dbring)
   print "number of missed rings: %s" % numberOfMissedRings
   print "number of fake rings: %s" % numberOfFakeRings
@@ -68,17 +64,24 @@ def resultLoop(*args):
   return allResults
 
 
-def missDuplicates(rings, db_rings):
-  duplicateRings = []
+def missedRings(rings, db_rings):
+# Checks if a ring from the db has a matching circle found with the algorithm
+# if there is no match add the db circle to the missed ring list.
+# @param list rings: list of rings found by the algorithm
+# @param list db_rings: list of true rings
+# @returns list missedRings: rings from the db that weren't found by the algorithm
+  missedRings = []
   while (len(db_rings)):
     dbring = db_rings.pop()
-    if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.20 and abs(dbring['radius'] - ring['radius']) < 0.10
+    if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.010 and abs(dbring['radius'] - ring['radius']) < 0.005
                                                                                       for ring in rings['foundRings']):
-      duplicateRings.append(dbring)
-  return duplicateRings
+      missedRings.append(dbring)
+  return missedRings
 
 
 if __name__=='__main__':
-  #res = resultLoop(missDuplicates)
-  #print res
-  bulk()
+  res = resultLoop(missedRings)
+  print res
+  pdb.set_trace()
+  #bulk()
+
