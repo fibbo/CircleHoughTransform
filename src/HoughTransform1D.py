@@ -9,20 +9,22 @@ import pdb
 from visualizeData import plotData
 from Tools import *
 
-
+DIMENSION=1001
 
 def HoughTransform1D( data ):
   
-  r = np.linspace(0,1,1001)
+  r = np.linspace(0,1,DIMENSION)
   used_points = []
   res = []
   for center in data['Center']:
-    weights = np.zeros(1001)
+    weights = np.zeros(DIMENSION)
     for x0,y0 in data['allPoints']:
       s = 2*0.001
       eta = (center[0]-x0)**2 + (center[1]-y0)**2 - r**2
       weights += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 ) / ( 2 * s ** 2 ) )
-  
+    plt.bar(range(DIMENSION),weights, width=2)
+    plt.xlim(0,300)
+    plt.show()
     index = np.argmax(weights)
     circle = {}
     circle['center'] = center

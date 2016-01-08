@@ -7,7 +7,8 @@ import pdb
 from visualizeData import plotData
 from Tools import *
 
-DIMENSION = 1001
+DIMENSION = 200
+VISUALISATION=True
 
 def HoughTransform2D( data ):
   xbins = np.linspace(-0.5,0.5,DIMENSION)
@@ -17,19 +18,19 @@ def HoughTransform2D( data ):
   for r in data['Radius']:
     weights = np.zeros( (DIMENSION,DIMENSION) )
     for x0,y0 in data['allPoints']:
-      s = 2*0.001
+      s = 0.001
       eta = (x-x0)**2 + (y-y0)**2 - r**2      
       weights += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 ) / ( 2 * s ** 2 ) )
+    if VISUALISATION:
+      img = plt.imshow(weights, interpolation='nearest')
+      plt.show()
     index = np.argmax(weights)
     i, j = np.unravel_index( index, (DIMENSION, DIMENSION))
-    n = DIMENSION
-    i_index = range(i-1 if i>0 else i,i+2 if i<n else i+1)
-    j_index = range(j-1 if j>0 else j,j+2 if j<n else j+1)
-    for ii in i_index:
-      weights[ii][j] = 0
-    for jj in j_index:
-      weights[i][jj] = 0
-    print xbins[i], ybins[j]
+    center = (xbins[i], ybins[j])
+    print center
+    used_xy = []
+    used_xy = [tup for tup in data['allPoints'] if abs( ( tup[0] - center[0] ) ** 2 + ( tup[1] - center[1] ) ** 2 - r ** 2 ) < 2 * 0.005]
+    data['allPoints'][:] = [tup for tup in data['allPoints'] if abs( ( tup[0] - center[0] ) ** 2 + ( tup[1] - center[1] ) ** 2 - r ** 2 ) > 2 * 0.005]
 
 
 

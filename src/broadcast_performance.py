@@ -1,3 +1,8 @@
+# ipython
+# %load broadcast_performance.py
+# %timeit funcA()
+# %timeit funcB()
+
 import numpy as np
 
 a = np.random.randn(100)

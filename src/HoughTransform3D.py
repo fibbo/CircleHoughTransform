@@ -8,53 +8,85 @@ from visualizeData import plotData
 from Tools import *
 
 DIMENSION=200
-R_DIMENSION=200
+R_DIMENSION=100
+
+VISUALISATION=True
 
 def HoughTransform3D( data ):
-  xbins = np.linspace(-0.5,0.5,DIMENSION)
-  ybins = np.linspace(-0.5,0.5,DIMENSION)
-  rbins = np.linspace(0,0.5, R_DIMENSION)
+  x = np.linspace(-0.5,0.5,DIMENSION)
+  y = np.linspace(-0.5,0.5,DIMENSION)
+  r = np.linspace(0,0.5, R_DIMENSION)
 
-  x,y,r = np.broadcast_arrays( xbins[...,np.newaxis,np.newaxis], \
-                               ybins[np.newaxis,...,np.newaxis], \
-                               rbins[np.newaxis,np.newaxis,...])
-
-  score = 2000
+  circles = []
+  score = 0
   used_xy = []
-  again_xy = []
+  circle_counter = 0
   while True:
-    # print score
-    weights = np.zeros( (DIMENSION, DIMENSION, R_DIMENSION))
+    weights = np.zeros( (R_DIMENSION, DIMENSION, DIMENSION))
     for x0,y0 in data['allPoints']:
-      s = 2*0.005
-      eta = ( x - x0 ) ** 2 + ( y - y0 ) ** 2 - r ** 2
+      s = 0.001
+      eta = (x[None,:,None]-x0)**2 + (y[None,None,:]-y0)**2 - r[:,None,None]**2
       weights += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 )\
                                                               / ( 2 * s ** 2 ) )
     index = np.argmax( weights )
-    ii,jj,rr = np.unravel_index( index, (DIMENSION, DIMENSION, R_DIMENSION))
-    score = weights[ii][jj][rr]
-    if score < 100:
+    rr,ii,jj = np.unravel_index( index, (R_DIMENSION, DIMENSION, DIMENSION))
+    score = weights.max()
+    if score < 2100:
+      print 'finished after %s circle(s) found' % circle_counter
       break
-    center = (xbins[ii], ybins[jj])
-    radius = rbins[rr]
-    i = 0
-    used_xy = []
-    used_xy = [tup for tup in data['allPoints'] if abs( ( tup[0] - center[0] ) ** 2 + ( tup[1] - center[1] ) ** 2 - radius ** 2 ) < 2 * 0.005]
-    data['allPoints'][:] = [tup for tup in data['allPoints'] if abs( ( tup[0] - center[0] ) ** 2 + ( tup[1] - center[1] ) ** 2 - radius ** 2 ) > 2 * 0.005]
-    ux, uy = zip(*used_xy)
-    fig = plt.figure()
-    ax1 = fig.add_subplot(211)
-    ax1.scatter(ux, uy,c='r')
-    plt.xlim(-0.5,0.5)
-    plt.ylim(-0.5,0.5)
-    if data['allPoints']:
-      ox, oy = zip(*data['allPoints'])
-      ax2 = fig.add_subplot(212)
-      ax2.scatter(ox, oy)
-    plt.xlim(-0.5,0.5)
-    plt.ylim(-0.5,0.5)
+    print "(x,y,r): (%s,%s,%s)" % (ii, jj, rr)
+    print "score: %s" % score
+    circle_counter += 1
+    circle = {}
+    circle['center'] = (x[ii], y[jj])
+    circle['radius'] = r[rr]
+    circles.append(circle)
+
+    used_xy += [tup for tup in data['allPoints'] if
+                abs( ( tup[0] - circle['center'][0] ) ** 2 +
+                     ( tup[1] - circle['center'][1] ) ** 2 -
+                     circle['radius'] ** 2 ) < 2 * 0.001]
+    data['allPoints'][:] = [tup for tup in data['allPoints'] if 
+                            abs( ( tup[0] - circle['center'][0] ) ** 2 + 
+                                 ( tup[1] - circle['center'][1] ) ** 2 - 
+                                 circle['radius'] ** 2 ) >= 2 * 0.001]
+
+
+    plt.imshow(weights[rr][:][:])
+    plt.colorbar()
     plt.show()
-    print center, radius
+
+    for r_i in range(R_DIMENSION):
+        fig,ax1 = plt.subplots()
+        img = ax1.imshow(weights[r_i][:][:], aspect='auto', interpolation='nearest')
+        cba = plt.colorbar(img)
+        plt.savefig('../img/slices/r_slices%s_circle%s.png' % (r_i, circle_counter))
+        plt.close()
+    
+    # if VISUALISATION:
+      # ux, uy = zip(*used_xy)
+      # fig = plt.figure()
+      # ax1 = fig.add_subplot(211)
+      # ax1.scatter(ux, uy,c='r')
+      # plt.xlim(-0.5,0.5)
+      # plt.ylim(-0.5,0.5)
+      # if data['allPoints']:
+      #   ox, oy = zip(*data['allPoints'])
+      #   ax2 = fig.add_subplot(212)
+      #   ax2.scatter(ox, oy)
+      # plt.xlim(-0.5,0.5)
+      # plt.ylim(-0.5,0.5)
+      # plt.show()
+      # print ii,jj,rr
+
+      # plt.show()
+      
+    
+  data['allPoints'] += used_xy
+  x,y = zip(*data['allPoints'])
+  plotData(x,y,circles)
+
+
 
 
 
