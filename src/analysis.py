@@ -72,8 +72,7 @@ def missDuplicates(rings, db_rings):
   duplicateRings = []
   while (len(db_rings)):
     dbring = db_rings.pop()
-    if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.20 and abs(dbring['radius'] - ring['radius']) < 0.10
-                                                                                      for ring in rings['foundRings']):
+    if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.20 and abs(dbring['radius'] - ring['radius']) < 0.10 for ring in rings['foundRings']):
       duplicateRings.append(dbring)
   return duplicateRings
 

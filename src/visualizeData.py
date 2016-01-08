@@ -33,9 +33,10 @@ def plotData( x,y, circles, savePath=None ):
     i+=1
     fig.gca().add_artist(c)
   plt.scatter(x,y, color='k', marker='o')
+  plt.show()
   if savePath:
     fig.savefig(savePath)
-  plt.show()
+  
 
 if __name__ == '__main__': 
   #### read data #####
