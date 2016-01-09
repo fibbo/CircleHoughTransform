@@ -1,10 +1,12 @@
 import os
 import pdb
 import cPickle as pickle
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-basePath = "/disk/data3/lhcb/phi/circleHT/splitData/run01/"
+basePath = "/disk/data3/lhcb/phi/circleHT/splitData/run05/"
 directories = sorted(os.listdir(basePath))
 db = pickle.load(open("/home/hep/phi/CircleHoughTransform/src/db.pkl", 'rb'))
 
@@ -99,7 +101,7 @@ def runtimeVsPoints():
     runtime.append(res['Runtime'])
     nPoints.append(res['nPoints'])
   plt.scatter(nPoints, runtime)
-  plt.show()
+  plt.savefig('runtime_vs_points_run05.png')
 
 
 if __name__=='__main__':
