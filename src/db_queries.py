@@ -1,5 +1,6 @@
 import pickle
 import os
+import numpy as np
 
 import matplotlib.pyplot as plt
 
@@ -46,14 +47,39 @@ def getCircleData( db, eventnumber ):
 
     
 
-def pointsPerCircleDistribution( db ):
+def pointsPerCircleDistribution( ):
   points = []
   for entry in db:
     for rings in entry['rings']:
       points.append(rings['nPe'])
 
-  plt.hist(points, 30)
+  bins = np.linspace(1,45,45)
+  plt.hist(points,bins)
   plt.show()
+
+def ratioOfCirclesMoreThanXPoints(x=8):
+  s_circle = 0
+  b_circle = 0
+  for entry in db:
+    for ring in entry['rings']:
+      if ring['nPe'] > x:
+        b_circle += 1
+      else:
+        s_circle += 1
+
+  return b_circle/float(s_circle+b_circle)
+
+
+def plotRatioOfCirclesWithMoreThanXPoints():
+  result = []
+  for x in range(8,40):
+    result.append(ratioOfCirclesMoreThanXPoints(x))
+
+  plt.plot(result)
+  plt.yticks(np.arange(0, 1, 0.1))
+  plt.ylabel('Ratio of circles bigger than $x$ over the total number of circles')
+  plt.show()
+
 
 def ringsPerEventDistribution( db ):
   rings = []
@@ -61,7 +87,8 @@ def ringsPerEventDistribution( db ):
     rings.append( len(entry['rings'] ) )
 
   print len(rings)
-  plt.hist(rings,15)
+  bins = np.linspace(1,40,40)
+  plt.hist(rings,bins)
   plt.show()
 
 def maxPoints( db ):
@@ -85,3 +112,4 @@ maxPoints( db )
 #getCircleData( db, 9999)
 # print findCircleWithLeastPoints(db)
 #print findMaxRadius( db )
+plotRatioOfCirclesWithMoreThanXPoints()
