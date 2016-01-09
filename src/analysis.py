@@ -3,6 +3,7 @@ import pdb
 import cPickle as pickle
 import matplotlib.pyplot as plt
 import numpy as np
+from parameters import *
 
 basePath = "/home/phi/workspace/CircleHT/analysis/run02"
 directories = sorted(os.listdir(basePath))
@@ -20,7 +21,7 @@ def getPKLs():
           continue
         except Exception, e:
           print e
-      pkls.append( (afile[:-4],pickle.load( open(os.path.join(path, afile), 'rb')) ) )
+      pkls.append( (int(afile[:-4]),pickle.load( open(os.path.join(path, afile), 'rb')) ) )
   return pkls
 
 def bulk():
@@ -95,8 +96,84 @@ def runtimeVsPoints():
   plt.scatter(nPoints, runtime)
   plt.show()
 
+def compareRings( db_rings, results):
+  """ Compare rings find by the algorithm with the known results from the pickle database. If any circle from the algorithm is within a certain
+  range (radius and center respectively) of a database circle we consider this database circle as found by the algorithm.
+
+  :param list db_rings: list of dictionaries that have the information of the simulated data
+  :param list results: list of dictionaries that have the circles found by the algorithm
+  :return list found_circles: list of dictionaries of circles found in the algorithm that have a match in the database
+
+  """
+  found_circles = []
+  missed_circles = []
+  fake_circles = []
+  # if 
+  while len(results):
+    result_ring = results.pop()
+    if any(abs(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center']))) < MAX_CENTER_DISTANCE and\
+           abs(result_ring['radius']-db_ring['radius']) < MAX_RADIUS_DISTANCE for db_ring in db_rings):
+      found_circles.append(result_ring)
+    else:
+      fake_circles.append(result_ring)
+
+  while len(db_rings):
+    db_ring = db_rings.pop()
+    if not any(abs(np.linalg.norm(np.array(db_ring['center']) - np.array(res['center']))) < MAX_CENTER_DISTANCE and
+           abs(db_ring['radius'] - res['radius'] < MAX_RADIUS_DISTANCE) for res in found_circles):
+      missed_circles.append(db_ring)
+
+  return found_circles, fake_circles, missed_circles
+
+
+def removeDuplicates( results ):
+  """ 
+
+  """
+  res = []
+  sorted_results = sorted( results, key=lambda k: k['nEntries'], reverse=True)
+  while len(sorted_results):
+    circle = sorted_results.pop()
+    unique = True
+
+    for dic in sorted_results:
+      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < MAX_CENTER_DISTANCE and\
+         (abs(circle['radius'] - dic['radius']) < MAX_RADIUS_DISTANCE):
+        unique = False
+        break
+    if unique:
+      res.append(circle)
+
+  return res
+
+
+def efficiency():
+  pkls = getPKLs()
+  found_circles = 0
+  missed_circles = 0
+  fake_circles = 0
+  tot_circles = 0
+  for pkl in pkls:
+    allRings = pkl[1]['allRings']
+    noDuplicates = removeDuplicates(allRings)
+    # pdb.set_trace()
+    db_entry = db[int(pkl[0])]['rings']
+    tot_circles += len(db_entry)
+    found, fake, missed = compareRings(db_entry, noDuplicates)
+    found_circles += len(found)
+    fake_circles += len(fake)
+    missed_circles += len(missed)
+
+
+
+  print "ratio of found circles over total circles: %s" % (found_circles/float(tot_circles))
+  print "wrongly found circles: %s" % fake_circles
+  print "missed circles: %s" % missed_circles
+
+    
+
 
 if __name__=='__main__':
   #res = resultLoop(missDuplicates)
   #print res
-  runtimeVsPoints()
+  efficiency()

@@ -125,17 +125,10 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
 
   return xy, r
 
-def fullCenterHistogram( xy, bins=NUMBER_OF_S_BINS ):
-  x,y = zip(*xy)
-  H, xedges, yedges, _ = plt.hist2d(x,y,bins, [[-0.5,0.5],[-0.5,0.5]])
-  plt.colorbar()
-  plt.show()
 
 def main( combinationsList, n ):
   """ Main logic of the algorithm. Here we put all the results from the
   other methods together and finally return a list of possible circles.
-
-  With the help of barycentric coordinates we calculate the radius and the center defined by each tuple of 3 points given as parameter
 
   @param: combinationsList: a list of all possible combinations of 3 points
   @param int n: number of triples in combinationsList
@@ -234,26 +227,15 @@ def extractCenter( center_dict ):
 
   n = NUMBER_OF_S_BINS
 
-  #TODO: to be able to set a mask to set values around the maximum index to 0
-  # for example
-  #                          111
-  #                          1x1
-  #                          111
-  #
-  # so x is the maximum we found and we want to set adjacent values to 0 as well
   while True:
     index = np.argmax(H)
     i, j = np.unravel_index( index, (NUMBER_OF_S_BINS, NUMBER_OF_S_BINS) )
-    #n_entries =   sum(sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j-1 if j>0 else j:j+2 if j<n else j+1]))
-    
-
     # this variation only takes the adjacent values of i,j
-    #
     #              1
     #             1x1 
     #              1
-    n_entries =   sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j]) + sum(H[i, j-1 if j>0 else j:j+2 if j+2 <= 3 else j+1]) - H[i,j]
-    if n_entries < CENTER_THRESHOLD:
+    score =   sum(H[i-1 if i>0 else i:i+2 if i<n else i+1,j]) + sum(H[i, j-1 if j>0 else j:j+2 if j+2 <= 3 else j+1]) - H[i,j]
+    if score < CENTER_THRESHOLD:
       break
 
     # Set the entries to 0 so they won't contribute twice
@@ -264,11 +246,8 @@ def extractCenter( center_dict ):
 
     for jj in j_index:
       H[i][jj] = 0
-    # for i in i_index:
-    #   for j in j_index:
-    #     H[i][j] = 0
     
-    centers.append( {'center' : (xedges[i], yedges[j]), 'nEntries' : n_entries } )
+    centers.append( {'center' : (xedges[i], yedges[j]), 'nEntries' : score } )
 
   return centers
 
@@ -285,47 +264,7 @@ def backgroundHistogram( filename ):
   bkgHistogram, edges = np.histogram(r, NUMBER_OF_R_BINS, [0,2])
   return bkgHistogram, edges
   
-def removeFakes( results ):
-  """ 
 
-  """
-  res = []
-  sorted_results = sorted( results, key=lambda k: k['nEntries'], reverse=True)
-  while len(sorted_results):
-    circle = sorted_results.pop()
-    unique = True
-
-    for dic in sorted_results:
-      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < MAX_CENTER_DISTANCE and\
-         (abs(circle['radius'] - dic['radius']) < MAX_RADIUS_DISTANCE):
-        unique = False
-    if unique:
-      res.append(circle)
-
-  return res
-
-def compareRings( db_rings, results):
-  """ Compare rings find by the algorithm with the known results from the pickle database. If any circle from the algorithm is within a certain
-  range (radius and center respectively) of a database circle we consider this database circle as found by the algorithm.
-
-  :param list db_rings: list of dictionaries that have the information of the simulated data
-  :param list results: list of dictionaries that have the circles found by the algorithm
-  :return list found_circles: list of dictionaries of circles found in the algorithm that have a match in the database
-
-  """
-  found_circles = []
-  missed_circles = []
-  fake_circles = []
-  # if 
-  while len(results):
-    result_ring = results.pop()
-    if any(abs(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center']))) < MAX_CENTER_DISTANCE and\
-           abs(result_ring['radius']-db_ring['radius']) < MAX_RADIUS_DISTANCE for db_ring in db_rings):
-      found_circles.append(result_ring)
-    else:
-      fake_circles.append(result_ring)
-
-  return found_circles, fake_circles
 
 
 def visualizeCenterHistogram( x,y, bins=NUMBER_OF_S_BINS ):
@@ -419,21 +358,12 @@ if __name__ == '__main__':
     res = res['Value']
 
     pickle_data['allRings'] = res
-
     # removing double entries
     circles = removeFakes(res)
 
     # now we compare the algorithm results with the real data
-    db = openDB()
     if EVENTNUMBER:
-      entry = db[int(EVENTNUMBER)]['rings']
-      found_circles, fake_circles = compareRings(entry, circles)
-
-      pickle_data['foundRings'] = found_circles
-      pickle_data['fakeRings'] = fake_circles
       pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
-      print "Algorithm found %s/%s circles" % (len(found_circles),len(entry))
-      print "Algorithm found %s fake circles" % len(fake_circles)
       plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
       if len(fake_circles):
         plotData(x,y,fake_circles,savePath=EVENTNUMBER+"_fakes.png")
