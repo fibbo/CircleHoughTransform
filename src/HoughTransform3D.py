@@ -25,11 +25,11 @@ def HoughTransform3D( data, name ):
     weights = np.zeros( (R_DIMENSION, DIMENSION, DIMENSION))
     for x0,y0 in data['allPoints']:
       s = 0.001
-      eta = (x[None,:,None]-x0)**2 + (y[None,None,:]-y0)**2 - r[:,None,None]**2
+      eta = (x[None,None,:]-x0)**2 + (y[None,:,None]-y0)**2 - r[:,None,None]**2
       weights += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 )\
                                                               / ( 2 * s ** 2 ) )
     index = np.argmax( weights )
-    rr,ii,jj = np.unravel_index( index, (R_DIMENSION, DIMENSION, DIMENSION))
+    rr,jj,ii = np.unravel_index( index, (R_DIMENSION, DIMENSION, DIMENSION))
     score = weights.max()
     if score < 2100:
       print 'finished after %s circle(s) found' % circle_counter

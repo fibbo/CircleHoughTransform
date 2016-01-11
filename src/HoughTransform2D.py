@@ -7,13 +7,13 @@ import pdb
 from visualizeData import plotData
 from Tools import *
 
-DIMENSION = 501
+DIMENSION = 1001
 VISUALISATION=True
 
 def HoughTransform2D( data, name ):
-  xbins = np.linspace(-0.5,0.5,DIMENSION)
-  ybins = np.linspace(-0.5,0.5,DIMENSION)
-  x, y = np.broadcast_arrays( xbins[..., np.newaxis], ybins[np.newaxis,...] )
+  x = np.linspace(-0.5,0.5,DIMENSION)
+  y = np.linspace(-0.5,0.5,DIMENSION)
+  # x, y = np.broadcast_arrays( xbins[..., np.newaxis], ybins[np.newaxis,...] )
   counter = 1
   circles = []
   used_xy = []
@@ -22,19 +22,19 @@ def HoughTransform2D( data, name ):
     weights = np.zeros( (DIMENSION,DIMENSION) )
     for x0,y0 in data['allPoints']:
       s = 0.001
-      eta = (x-x0)**2 + (y-y0)**2 - r**2      
+      eta = (x[None,:]-x0)**2 + (y[:,None]-y0)**2 - r**2      
       weights += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 ) / ( 2 * s ** 2 ) )
     if VISUALISATION:
-      img = plt.imshow(weights, interpolation='nearest')
+      img = plt.imshow(weights, interpolation='nearest', origin='lower')
       cba = plt.colorbar(img)
       plt.xlabel('$x$')
       plt.ylabel('$y$')
       plt.savefig('../img/2D_HT/center_scores_%s_%s.pdf' % (name, counter))
       plt.close()
     index = np.argmax(weights)
-    i, j = np.unravel_index( index, (DIMENSION, DIMENSION))
+    j, i = np.unravel_index( index, (DIMENSION, DIMENSION))
     circle = {}
-    circle['center'] = (xbins[i], ybins[j])
+    circle['center'] = (x[i], y[j])
     circle['radius'] = r
     circles.append(circle)
     counter += 1
