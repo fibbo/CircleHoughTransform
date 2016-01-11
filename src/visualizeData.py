@@ -12,6 +12,7 @@ def convertTuplesToList( tuples ):
 
   return x,y
 
+
 def plotData( x,y, circles, savePath=None ):
   colors = ['b','g','r','c','m','y']
   font = {'weight' : 'normal',
@@ -35,8 +36,7 @@ def plotData( x,y, circles, savePath=None ):
   plt.scatter(x,y, color='k', marker='o')
   if savePath:
     fig.savefig(savePath)
-  plt.show()
-  
+
 
 if __name__ == '__main__': 
   #### read data #####

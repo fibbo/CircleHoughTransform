@@ -38,6 +38,16 @@ def readFile_old( filename ):
 
   return { 'x' : x, 'y' : y, 'Center' : center, 'Radius' : radius, 'nPoints' : nPoints }
 
+
+def getCirclesFromData(data):
+  circles = []
+  for c,r in zip(data['Center'],data['Radius']):
+    circle = {}
+    circle['center'] = c
+    circle['radius'] = r
+    circles.append(circle)
+  return circles
+
 def readFile( filename ):
   """ Reads the x, y coordinates of
       the circle points into a list of list (points) and seperately into lists x and y
