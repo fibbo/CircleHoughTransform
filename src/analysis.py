@@ -5,12 +5,21 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from parameters import *
+#from parameters import *
 from visualizeData import *
+from Tools import *
+import copy
 
-basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run01/"
+
+MAX_CENTER_DISTANCE = 0.05
+MAX_RADIUS_DISTANCE = 0.05
+
+
+basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run02/"
 directories = sorted(os.listdir(basePath))
 db = pickle.load(open("/home/phi/workspace/CircleHT/src/db.pkl", 'rb'))
+filefolder = "/home/phi/workspace/CircleHT/data/lhcb_data/"
+
 
 def getPKLs():
   pkls = []
@@ -24,7 +33,7 @@ def getPKLs():
           continue
         except Exception, e:
           print e
-      pkls.append( (int(afile[:-4]),pickle.load( open(os.path.join(path, afile), 'rb')) ) )
+      pkls.append( (afile[:-4],pickle.load( open(os.path.join(path, afile), 'rb')) ) )
   return pkls
 
 def bulk():
@@ -146,8 +155,8 @@ def removeDuplicates( results ):
     unique = True
 
     for dic in sorted_results:
-      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < MAX_CENTER_DISTANCE and\
-         (abs(circle['radius'] - dic['radius']) < MAX_RADIUS_DISTANCE):
+      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < 0.05 and\
+         (abs(circle['radius'] - dic['radius']) < 0.05):
         unique = False
         break
     if unique:
@@ -162,18 +171,33 @@ def efficiency():
   missed_circles = 0
   fake_circles = 0
   tot_circles = 0
+  counter = 0
   for pkl in pkls:
     allRings = pkl[1]['allRings']
     noDuplicates = removeDuplicates(allRings)
     # pdb.set_trace()
     db_entry = db[int(pkl[0])]['rings']
+    rings = copy.deepcopy(db_entry)
     tot_circles += len(db_entry)
-    print pkl
     found, fake, missed = compareRings(db_entry, noDuplicates)
     found_circles += len(found)
     fake_circles += len(fake)
     missed_circles += len(missed)
 
+
+    data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
+    x,y = zip(*data['allPoints'])
+    destPathSim = basePath+'img/'+pkl[0]+'.pdf'
+    destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
+    plotData(x,y,found,savePath=destPathSim)
+    plotData(x,y,rings,savePath=destPathReal)
+    if len(found) > len(rings):
+      print pkl[0]
+
+    counter += 1
+    if not counter%100:
+      progress = float(counter)/10000
+      print 'Progress: %d %%' % progress
 
   print "ratio of found circles over total circles: %s" % (found_circles/float(tot_circles))
   print "wrongly found circles: %s" % fake_circles

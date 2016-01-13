@@ -36,6 +36,7 @@ def plotData( x,y, circles, savePath=None ):
   plt.scatter(x,y, color='k', marker='o')
   if savePath:
     fig.savefig(savePath)
+    plt.close()
   else:
     plt.show()
 
