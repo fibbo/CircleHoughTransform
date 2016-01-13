@@ -9,13 +9,13 @@ import numpy as np
 from visualizeData import *
 from Tools import *
 import copy
-
+from __future__ import print_function
 
 MAX_CENTER_DISTANCE = 0.05
 MAX_RADIUS_DISTANCE = 0.05
 
 
-basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run02/"
+basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run01/"
 directories = sorted(os.listdir(basePath))
 db = pickle.load(open("/home/phi/workspace/CircleHT/src/db.pkl", 'rb'))
 filefolder = "/home/phi/workspace/CircleHT/data/lhcb_data/"
@@ -32,62 +32,9 @@ def getPKLs():
           os.remove(os.path.join(path.afile))
           continue
         except Exception, e:
-          print e
+          print(e)
       pkls.append( (afile[:-4],pickle.load( open(os.path.join(path, afile), 'rb')) ) )
   return pkls
-
-def bulk():
-  numberOfFakeRings = 0
-  numberOfFoundRings = 0
-  numberOfTotalRings = 0
-  numberOfMissedRings= 0
-  numberOfDuplicates = 0
-  duplicateRings = []
-  ifile = open('fakeEvents.txt','wb')
-  pkls = getPKLs()
-  for pkl in pkls:
-    res = pkl[1]
-    eventNumber = int(pkl[0])
-    db_rings = db[eventNumber]['rings']
-  # if afile == '0001.pkl':
-  #   print res
-  #   print db[int(afile[:-4])]
-  # 
-    if len(res['fakeRings']):
-     ifile.write(str(eventNumber)+"\n")
-    numberOfFakeRings += len(res['fakeRings'])
-    numberOfFoundRings += len(res['foundRings'])
-    numberOfTotalRings += len(db_rings)
-    while (len(db_rings)):
-      dbring = db_rings.pop()
-      if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.25 and abs(dbring['radius'] - ring['radius']) < 0.10\
-       for ring in res['foundRings']):
-        duplicateRings.append(dbring)
-  print "number of missed rings: %s" % numberOfMissedRings
-  print "number of fake rings: %s" % numberOfFakeRings
-  print "number of found rings: %s" % numberOfFoundRings
-  print "number of total rings: %s" % numberOfTotalRings
-  print "number of rings missed: %s" % (numberOfTotalRings-numberOfFoundRings)
-  print "fake efficiency: %s" % (float(numberOfFakeRings)/numberOfTotalRings)
-  print "total efficiency: %s" % (float(numberOfFoundRings)/numberOfTotalRings)
-  print "duplicates: %s" % numberOfDuplicates
-
-def resultLoop(*args):
-  """ Find duplicate rings that were missed because the cut wasn't loose enough
-  """
-  allResults = []
-  for directory in directories:
-    path = os.path.join(basePath, directory)
-    files = os.listdir(path)
-    for afile in [f for f in files if f.endswith('.pkl')]:
-      res = pickle.load( open(os.path.join(path,afile), 'rb') )
-      eventNumber = int(afile[:-4])
-      db_rings = db[eventNumber]['rings']
-      for function in args:
-        res = function(res, db_rings)
-        allResults += res
-  return allResults
-
 
 def missedRings(rings, db_rings):
 # Checks if a ring from the db has a matching circle found with the algorithm
@@ -188,8 +135,8 @@ def efficiency():
 
     counter += 1
     if not counter%100:
-      progress = float(counter)/10000
-      print 'Progress: %d %%' % progress
+      progress = 100*float(counter)/10000
+      print('Progress: %.2f %%' % progress, end='\r')
     if MAKEPLOTS:
       data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
       x,y = zip(*data['allPoints'])
