@@ -21,4 +21,5 @@ Circle.sublime-project
 *.bbl
 /img
 /data
+submitData.pbs.*
 /serie0

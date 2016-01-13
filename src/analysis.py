@@ -1,13 +1,16 @@
 import os
 import pdb
 import cPickle as pickle
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from parameters import *
+from visualizeData import *
 
-basePath = "/home/phi/workspace/CircleHT/analysis/run02"
+basePath = "/disk/data3/lhcb/phi/circleHT/Threshold/split/run01/"
 directories = sorted(os.listdir(basePath))
-db = pickle.load(open("/home/phi/workspace/CircleHT/analysis/db.pkl", 'rb'))
+db = pickle.load(open("/home/hep/phi/CircleHoughTransform/src/db.pkl", 'rb'))
 
 def getPKLs():
   pkls = []
@@ -77,13 +80,19 @@ def resultLoop(*args):
   return allResults
 
 
-def missDuplicates(rings, db_rings):
-  duplicateRings = []
+def missedRings(rings, db_rings):
+# Checks if a ring from the db has a matching circle found with the algorithm
+# if there is no match add the db circle to the missed ring list.
+# @param list rings: list of rings found by the algorithm
+# @param list db_rings: list of true rings
+# @returns list missedRings: rings from the db that weren't found by the algorithm
+  missedRings = []
   while (len(db_rings)):
     dbring = db_rings.pop()
-    if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.20 and abs(dbring['radius'] - ring['radius']) < 0.10 for ring in rings['foundRings']):
-      duplicateRings.append(dbring)
-  return duplicateRings
+    if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.010 and abs(dbring['radius'] - ring['radius']) < 0.005
+                                                                                      for ring in rings['foundRings']):
+      missedRings.append(dbring)
+  return missedRings
 
 def runtimeVsPoints():
   runtime = []
@@ -94,7 +103,7 @@ def runtimeVsPoints():
     runtime.append(res['Runtime'])
     nPoints.append(res['nPoints'])
   plt.scatter(nPoints, runtime)
-  plt.show()
+  plt.savefig('runtime_vs_points_run05.png')
 
 def compareRings( db_rings, results):
   """ Compare rings find by the algorithm with the known results from the pickle database. If any circle from the algorithm is within a certain
@@ -159,11 +168,11 @@ def efficiency():
     # pdb.set_trace()
     db_entry = db[int(pkl[0])]['rings']
     tot_circles += len(db_entry)
+    print pkl
     found, fake, missed = compareRings(db_entry, noDuplicates)
     found_circles += len(found)
     fake_circles += len(fake)
     missed_circles += len(missed)
-
 
 
   print "ratio of found circles over total circles: %s" % (found_circles/float(tot_circles))

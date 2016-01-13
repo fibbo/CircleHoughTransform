@@ -13,7 +13,7 @@ import os
 
 import numpy as np
 import matplotlib
-#matplotlib.use("Agg")
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import misc as sp
 from visualizeData import plotData, convertTuplesToList
@@ -148,9 +148,9 @@ def main( combinationsList, n ):
   radius_histogram, edges,  center_data = res['Value']
 
   # create a background histogram
-  factor = sp.comb(600,3)/sp.comb(n,3)
-  bkgHistogram = np.loadtxt('600_bg_r.txt')
-  bkgHistogram /= factor
+  #factor = sp.comb(600,3)/sp.comb(n,3)
+  #bkgHistogram = np.loadtxt('600_bg_r.txt')
+  #bkgHistogram /= factor
 
   radius = {}
   radius['H'] = radius_histogram #- bkgHistogram
@@ -308,7 +308,7 @@ if __name__ == '__main__':
   if len( sys.argv ) == 2:
     path = sys.argv[1]
     data = readFile( path )
-    if path.startswith('Event'):
+    if 'Event' in path:
       EVENTNUMBER = sys.argv[1][-8:-4]
       fileName = sys.argv[1][-12:-4]+".png"
     else:
@@ -361,14 +361,14 @@ if __name__ == '__main__':
 
     pickle_data['allRings'] = res
     # removing double entries
-    circles = res
-    print circles
+    #circles = removeFakes(res)
+
+    pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
     # now we compare the algorithm results with the real data
-    if EVENTNUMBER:
-      pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
-      plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
-      if len(fake_circles):
-        plotData(x,y,fake_circles,savePath=EVENTNUMBER+"_fakes.png")
-        plotData(x,y,circles, savePath=EVENTNUMBER+"_allCircles.png")
-    else:
-      plotData(x,y, circles)
+   # if EVENTNUMBER:
+   #   plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
+   #   if len(fake_circles):
+   #     plotData(x,y,fake_circles,savePath=EVENTNUMBER+"_fakes.png")
+   #     plotData(x,y,circles, savePath=EVENTNUMBER+"_allCircles.png")
+   # else:
+   #   plotData(x,y, circles)
