@@ -157,7 +157,7 @@ def main( combinationsList, n ):
   radius['xedges'] = edges
   radius['center_data'] = center_data
 
-  visualizeRadiusHistogram(radius)
+  # visualizeRadiusHistogram(radius)
 
   radiuses, center_data = extractRadius(radius)
 
@@ -333,12 +333,14 @@ if __name__ == '__main__':
   combinationsList = []
   if len(data['allPoints']) > 1:
     with Timer() as t:
+      print 'Splitting List'
       combinationsList +=   list(itertools.combinations( data['allPoints'][:len(data['allPoints'])/2], 3 ) )
       combinationsList +=   list(itertools.combinations( data['allPoints'][len(data['allPoints'])/2:], 3 ) ) 
     print "Time for creating triple list: %ss" % t.secs
     pickle_data['combTime'] = t.secs
   else:
     with Timer() as t:
+      print 'Single List'
       combinationsList = list(itertools.combinations( data['allPoints'], 3))
     print "Time for creating triple list: %ss" % t.secs
     pickle_data['combTime'] = t.secs

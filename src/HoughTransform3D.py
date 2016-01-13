@@ -12,7 +12,7 @@ R_DIMENSION=100
 
 VISUALISATION=True
 
-def HoughTransform3D( data ):
+def HoughTransform3D( data, name ):
   x = np.linspace(-0.5,0.5,DIMENSION)
   y = np.linspace(-0.5,0.5,DIMENSION)
   r = np.linspace(0,0.5, R_DIMENSION)
@@ -25,11 +25,11 @@ def HoughTransform3D( data ):
     weights = np.zeros( (R_DIMENSION, DIMENSION, DIMENSION))
     for x0,y0 in data['allPoints']:
       s = 0.001
-      eta = (x[None,:,None]-x0)**2 + (y[None,None,:]-y0)**2 - r[:,None,None]**2
+      eta = (x[None,None,:]-x0)**2 + (y[None,:,None]-y0)**2 - r[:,None,None]**2
       weights += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 )\
                                                               / ( 2 * s ** 2 ) )
     index = np.argmax( weights )
-    rr,ii,jj = np.unravel_index( index, (R_DIMENSION, DIMENSION, DIMENSION))
+    rr,jj,ii = np.unravel_index( index, (R_DIMENSION, DIMENSION, DIMENSION))
     score = weights.max()
     if score < 2100:
       print 'finished after %s circle(s) found' % circle_counter
@@ -52,15 +52,15 @@ def HoughTransform3D( data ):
                                  circle['radius'] ** 2 ) >= 2 * 0.001]
 
 
-    plt.imshow(weights[rr][:][:])
-    plt.colorbar()
-    plt.show()
+    # plt.imshow(weights[rr][:][:])
+    # plt.colorbar()
+    # plt.show()
 
     for r_i in range(R_DIMENSION):
         fig,ax1 = plt.subplots()
         img = ax1.imshow(weights[r_i][:][:], aspect='auto', interpolation='nearest')
         cba = plt.colorbar(img)
-        plt.savefig('../img/slices/r_slices%s_circle%s.png' % (r_i, circle_counter))
+        plt.savefig('../img/3D_HT/slices/r_slices_%s_%s_circle%s.png' % (name, r_i, circle_counter))
         plt.close()
     
     # if VISUALISATION:
@@ -84,7 +84,8 @@ def HoughTransform3D( data ):
     
   data['allPoints'] += used_xy
   x,y = zip(*data['allPoints'])
-  plotData(x,y,circles)
+  plotData(x,y,circles, savePath='../img/3D_HT/result_%s.pdf' % name)
+  plotData(x,y,getCirclesFromData(data), savePath='../img/3D_HT/real_result_%s.pdf' % name)
 
 
 
@@ -97,4 +98,4 @@ if __name__ == '__main__':
 
   path = sys.argv[1]
   data = readFile(path)
-  HoughTransform3D(data)
+  HoughTransform3D(data, path[8:-4])

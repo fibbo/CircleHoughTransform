@@ -11,29 +11,43 @@ from Tools import *
 
 DIMENSION=1001
 
-def HoughTransform1D( data ):
+def HoughTransform1D( data,name ):
   
   r = np.linspace(0,1,DIMENSION)
   used_points = []
   res = []
+  counter = 1
   for center in data['Center']:
     weights = np.zeros(DIMENSION)
     for x0,y0 in data['allPoints']:
       s = 2*0.001
       eta = (center[0]-x0)**2 + (center[1]-y0)**2 - r**2
       weights += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 ) / ( 2 * s ** 2 ) )
-    plt.bar(range(DIMENSION),weights, width=2)
-    plt.xlim(0,300)
-    plt.show()
+    lines = plt.plot(np.linspace(0,1,DIMENSION),weights)
+    plt.setp(lines, linewidth=1.5, color='b')
+    plt.xlim(0.,0.5)
+    plt.ylim(0,4500)
+    plt.xlabel('radius')
+    plt.ylabel('score')
+    plt.xticks(np.arange(0, 1, 0.1))
+
+
+    # labels = np.linspace(0,1,21)
+    # ax.set_xticklabels(labels)
+    # plt.xlim(0,300)
+    plt.savefig('../img/1D_HT/radius_scores_%s_%s.pdf' % (name, counter))
+    plt.close()
     index = np.argmax(weights)
     circle = {}
     circle['center'] = center
     circle['radius'] = r[index]
     res.append(circle)
+    counter += 1
 
 
   x,y = zip(*data['allPoints'])
-  plotData(x,y,res)
+  plotData(x,y,res,savePath='../img/1D_HT/result_%s.pdf' % name)
+  plotData(x,y,getCirclesFromData(data), savePath='../img/1D_HT/real_result_%s.pdf' % name)
 
 def removePoints(data, center, r):
   used_points = []
@@ -64,7 +78,7 @@ if __name__ == '__main__':
   #   i += 1
   # print data['GridSum']
   #visualize( data )
-  HoughTransform1D(data)
+  HoughTransform1D(data,path[8:-4])
   print 'The End'
 
 
