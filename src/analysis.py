@@ -6,8 +6,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from parameters import *
+from visualizeData import *
 
-basePath = "/disk/data3/lhcb/phi/circleHT/splitData/run05/"
+basePath = "/disk/data3/lhcb/phi/circleHT/Threshold/split/run01/"
 directories = sorted(os.listdir(basePath))
 db = pickle.load(open("/home/hep/phi/CircleHoughTransform/src/db.pkl", 'rb'))
 
@@ -167,11 +168,11 @@ def efficiency():
     # pdb.set_trace()
     db_entry = db[int(pkl[0])]['rings']
     tot_circles += len(db_entry)
+    print pkl
     found, fake, missed = compareRings(db_entry, noDuplicates)
     found_circles += len(found)
     fake_circles += len(fake)
     missed_circles += len(missed)
-
 
 
   print "ratio of found circles over total circles: %s" % (found_circles/float(tot_circles))

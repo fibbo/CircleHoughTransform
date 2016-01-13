@@ -1,14 +1,17 @@
+#PBS -e /home/hep/phi/CircleHoughTransform/src/logs/error/$PBS_JOBID.err
+#PBS -o /home/hep/phi/CircleHoughTransform/src/logs/output/$PBS_JOBID.out
+
 echo Start Job at `date`
 # File script to run circle detection algorithm 
-
+SCRATCH_DIR=/scratch/$USER/$PBS_JOBID
 # Create temporary job folder
-mkdir -p /scratch/$USER/$PBS_JOBID
+mkdir -p $SCRATCH_DIR 
 
 # Copy all the necessary files to the temporary job folder
-cp $HOME/CircleHoughTransform/src/*.py /scratch/$USER/$PBS_JOBID/
-cp $HOME/CircleHoughTransform/src/600_bg_r.txt /scratch/$USER/$PBS_JOBID/
-cp $HOME/CircleHoughTransform/src/db.pkl /scratch/$USER/$PBS_JOBID/
-cd /scratch/$USER/$PBS_JOBID
+cp $HOME/CircleHoughTransform/src/*.py $SCRATCH_DIR 
+cp $HOME/CircleHoughTransform/src/600_bg_r.txt $SCRATCH_DIR
+cp $HOME/CircleHoughTransform/src/db.pkl $SCRATCH_DIR
+cd $SCRATCH_DIR
 
 
 # Setting path for event source files
@@ -36,17 +39,17 @@ endnr=$(printf "%04d" $(($event+$fpj)))
 event=$(printf "%04d" $event)
 numbering=${event}_${endnr}
 
-eventdir="/disk/data3/lhcb/phi/circleHT/splitData/run05/Event"
+eventdir="/disk/data3/lhcb/phi/circleHT/Threshold/split/run02/Event"
 fullpath=${eventdir}_${numbering}
 mkdir -p ${fullpath}
 
 # Clean up
 # Removing all python and txt files from the scratch folder
-rm -rf /scratch/$USER/$PBS_JOBID/*.py*
-rm -rf /scratch/$USER/$PBS_JOBID/*.txt
-rm -rf /scratch/$USER/$PBS_JOBID/db.pkl
+rm -rf $SCRATCH_DIR/*.py*
+rm -rf $SCRATCH_DIR/*.txt
+rm -rf $SCRATCH_DIR/db.pkl
 # Copy the remaining files to the event folder
-cp -rf /scratch/$USER/$PBS_JOBID/* $fullpath
+cp -rf $SCRATCH_DIR/* $fullpath
 
 # Remove scratch folder
-rm -rf /scratch/$USER/$PBS_JOBID
+rm -rf $SCRATCH_DIR
