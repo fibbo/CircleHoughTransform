@@ -8,9 +8,9 @@ import numpy as np
 from parameters import *
 from visualizeData import *
 
-basePath = "/disk/data3/lhcb/phi/circleHT/Threshold/split/run01/"
+basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run01/"
 directories = sorted(os.listdir(basePath))
-db = pickle.load(open("/home/hep/phi/CircleHoughTransform/src/db.pkl", 'rb'))
+db = pickle.load(open("/home/phi/workspace/CircleHT/src/db.pkl", 'rb'))
 
 def getPKLs():
   pkls = []
