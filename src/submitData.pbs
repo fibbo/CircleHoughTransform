@@ -39,7 +39,7 @@ endnr=$(printf "%04d" $(($event+$fpj)))
 event=$(printf "%04d" $event)
 numbering=${event}_${endnr}
 
-eventdir="/disk/data3/lhcb/phi/circleHT/Threshold/split/run02/Event"
+eventdir="/disk/data3/lhcb/phi/circleHT/Threshold/split/run03/Event"
 fullpath=${eventdir}_${numbering}
 mkdir -p ${fullpath}
 
