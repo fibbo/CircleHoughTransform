@@ -44,7 +44,6 @@ def HoughTransform1D( data,name ):
     res.append(circle)
     counter += 1
 
-
   x,y = zip(*data['allPoints'])
   plotData(x,y,res,savePath='../img/1D_HT/result_%s.pdf' % name)
   plotData(x,y,getCirclesFromData(data), savePath='../img/1D_HT/real_result_%s.pdf' % name)

@@ -31,7 +31,7 @@ def HoughTransform3D( data, name ):
     index = np.argmax( weights )
     rr,jj,ii = np.unravel_index( index, (R_DIMENSION, DIMENSION, DIMENSION))
     score = weights.max()
-    if score < 2100:
+    if score < 3500:
       print 'finished after %s circle(s) found' % circle_counter
       break
     print "(x,y,r): (%s,%s,%s)" % (ii, jj, rr)
@@ -56,12 +56,12 @@ def HoughTransform3D( data, name ):
     # plt.colorbar()
     # plt.show()
 
-    for r_i in range(R_DIMENSION):
-        fig,ax1 = plt.subplots()
-        img = ax1.imshow(weights[r_i][:][:], aspect='auto', interpolation='nearest')
-        cba = plt.colorbar(img)
-        plt.savefig('../img/3D_HT/slices/r_slices_%s_%s_circle%s.png' % (name, r_i, circle_counter))
-        plt.close()
+    # for r_i in range(R_DIMENSION):
+    #     fig,ax1 = plt.subplots()
+    #     img = ax1.imshow(weights[r_i][:][:], aspect='auto', interpolation='nearest')
+    #     cba = plt.colorbar(img)
+    #     plt.savefig('../img/3D_HT/slices/r_slices_%s_%s_circle%s.pdf' % (name, r_i, circle_counter))
+    #     plt.close()
     
     # if VISUALISATION:
       # ux, uy = zip(*used_xy)
@@ -98,4 +98,7 @@ if __name__ == '__main__':
 
   path = sys.argv[1]
   data = readFile(path)
-  HoughTransform3D(data, path[8:-4])
+  if 'Event' not in path:
+    HoughTransform3D(data, path[8:-4])
+  else:
+    HoughTransform3D(data, path[-8:-4])

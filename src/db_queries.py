@@ -104,7 +104,7 @@ def maxPoints( db ):
       eventnumber = i
   print eventnumber
 
-maxPoints( db )
+# maxPoints( db )
 #print db[3]
 #ringsPerEventDistribution( db )
 #pointsPerCircleDistribution(db)
@@ -112,4 +112,5 @@ maxPoints( db )
 #getCircleData( db, 9999)
 # print findCircleWithLeastPoints(db)
 #print findMaxRadius( db )
-plotRatioOfCirclesWithMoreThanXPoints()
+print db
+# plotRatioOfCirclesWithMoreThanXPoints()
