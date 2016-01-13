@@ -183,14 +183,6 @@ def efficiency():
     found_circles += len(found)
     fake_circles += len(fake)
     missed_circles += len(missed)
-
-
-    data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
-    x,y = zip(*data['allPoints'])
-    destPathSim = basePath+'img/'+pkl[0]+'.pdf'
-    destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
-    plotData(x,y,found,savePath=destPathSim)
-    plotData(x,y,rings,savePath=destPathReal)
     if len(found) > len(rings):
       print pkl[0]
 
@@ -198,6 +190,13 @@ def efficiency():
     if not counter%100:
       progress = float(counter)/10000
       print 'Progress: %d %%' % progress
+    if MAKEPLOTS:
+      data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
+      x,y = zip(*data['allPoints'])
+      destPathSim = basePath+'img/'+pkl[0]+'.pdf'
+      destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
+      plotData(x,y,found,savePath=destPathSim)
+      plotData(x,y,rings,savePath=destPathReal)
 
   print "ratio of found circles over total circles: %s" % (found_circles/float(tot_circles))
   print "wrongly found circles: %s" % fake_circles
@@ -209,4 +208,8 @@ def efficiency():
 if __name__=='__main__':
   #res = resultLoop(missDuplicates)
   #print res
+  if len(sys.argv)==2:
+    MAKEPLOTS = sys.argv[1]
+  else:
+    MAKEPLOTS = False
   efficiency()
