@@ -7,10 +7,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from parameters import *
 from visualizeData import *
+from Tools import *
+import copy
 
 basePath = "/disk/data3/lhcb/phi/circleHT/Threshold/split/run01/"
 directories = sorted(os.listdir(basePath))
 db = pickle.load(open("/home/hep/phi/CircleHoughTransform/src/db.pkl", 'rb'))
+filefolder = "/disk/data1/hep/che/HoughTransform/serie0/files/"
+
 
 def getPKLs():
   pkls = []
@@ -24,7 +28,7 @@ def getPKLs():
           continue
         except Exception, e:
           print e
-      pkls.append( (int(afile[:-4]),pickle.load( open(os.path.join(path, afile), 'rb')) ) )
+      pkls.append( (afile[:-4],pickle.load( open(os.path.join(path, afile), 'rb')) ) )
   return pkls
 
 def bulk():
@@ -158,6 +162,7 @@ def removeDuplicates( results ):
 
 def efficiency():
   pkls = getPKLs()
+  print len(pkls)
   found_circles = 0
   missed_circles = 0
   fake_circles = 0
@@ -167,13 +172,20 @@ def efficiency():
     noDuplicates = removeDuplicates(allRings)
     # pdb.set_trace()
     db_entry = db[int(pkl[0])]['rings']
+    rings = copy.deepcopy(db_entry)
     tot_circles += len(db_entry)
-    print pkl
     found, fake, missed = compareRings(db_entry, noDuplicates)
     found_circles += len(found)
     fake_circles += len(fake)
     missed_circles += len(missed)
 
+
+    data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
+    x,y = zip(*data['allPoints'])
+    destPathSim = basePath+'img/'+pkl[0]+'.pdf'
+    destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
+    plotData(x,y,found,savePath=destPathSim)
+    plotData(x,y,rings,savePath=destPathReal)
 
   print "ratio of found circles over total circles: %s" % (found_circles/float(tot_circles))
   print "wrongly found circles: %s" % fake_circles
