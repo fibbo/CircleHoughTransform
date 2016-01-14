@@ -13,7 +13,7 @@ import os
 
 import numpy as np
 import matplotlib
-matplotlib.use("Agg")
+# matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import misc as sp
 from visualizeData import plotData, convertTuplesToList
@@ -324,7 +324,7 @@ if __name__ == '__main__':
   # Pickle dictionary where we store the results 
   pickle_data = {}
 
-  pickle_data['Parameters'] = { "MAX_RADIUS_DISTANCE" : MAX_RADIUS_DISTANCE, "MAX_CENTER_DISTANCE" : MAX_CENTER_DISTANCE,\
+  pickle_data['Parameters'] = { "MAX_RADIUS_DISTANCE" : REAL_MAX_RADIUS_DISTANCE, "MAX_CENTER_DISTANCE" : REAL_MAX_CENTER_DISTANCE,\
                                 "MAX_POINT_DISTANCE" : MAX_POINT_DISTANCE, "RADIUS_THRESHOLD" : RADIUS_THRESHOLD,\
                                 "CENTER_THRESHOLD" : CENTER_THRESHOLD, "NUMBER_OF_S_BINS" : NUMBER_OF_S_BINS,\
                                 "NUMBER_OF_R_BINS" : NUMBER_OF_R_BINS }
@@ -362,9 +362,11 @@ if __name__ == '__main__':
     pickle_data['allRings'] = res
     # removing double entries
     #circles = removeFakes(res)
-
+  if EVENTNUMBER:
     pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
     # now we compare the algorithm results with the real data
+  else:
+    plotData(x,y,res)
    # if EVENTNUMBER:
    #   plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
    #   if len(fake_circles):

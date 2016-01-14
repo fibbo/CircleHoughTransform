@@ -1,19 +1,15 @@
-import os
+from __future__ import print_function
 import pdb
+import os
 import cPickle as pickle
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-#from parameters import *
 from visualizeData import *
 from Tools import *
 import copy
-from __future__ import print_function
-
-MAX_CENTER_DISTANCE = 0.05
-MAX_RADIUS_DISTANCE = 0.05
-
+from parameters import *
 
 basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run01/"
 directories = sorted(os.listdir(basePath))
@@ -45,7 +41,7 @@ def missedRings(rings, db_rings):
   missedRings = []
   while (len(db_rings)):
     dbring = db_rings.pop()
-    if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < 0.010 and abs(dbring['radius'] - ring['radius']) < 0.005
+    if not any(np.linalg.norm(np.array(dbring['center'])-np.array(ring['center'])) < MAX_CENTER_DISTANCE and abs(dbring['radius'] - ring['radius']) < MAX_RADIUS_DISTANCE
                                                                                       for ring in rings['foundRings']):
       missedRings.append(dbring)
   return missedRings
@@ -73,19 +69,21 @@ def compareRings( db_rings, results):
   found_circles = []
   missed_circles = []
   fake_circles = []
+
+  results = sorted(results, key=lambda k: k['nEntries'], reverse=True)
   # if 
   while len(results):
     result_ring = results.pop()
-    if any(abs(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center']))) < MAX_CENTER_DISTANCE and\
-           abs(result_ring['radius']-db_ring['radius']) < MAX_RADIUS_DISTANCE for db_ring in db_rings):
+    if any(abs(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center']))) < REAL_MAX_CENTER_DISTANCE and\
+           abs(result_ring['radius']-db_ring['radius']) < REAL_MAX_RADIUS_DISTANCE for db_ring in db_rings):
       found_circles.append(result_ring)
     else:
       fake_circles.append(result_ring)
 
   while len(db_rings):
     db_ring = db_rings.pop()
-    if not any(abs(np.linalg.norm(np.array(db_ring['center']) - np.array(res['center']))) < MAX_CENTER_DISTANCE and
-           abs(db_ring['radius'] - res['radius'] < MAX_RADIUS_DISTANCE) for res in found_circles):
+    if not any(abs(np.linalg.norm(np.array(db_ring['center']) - np.array(res['center']))) < REAL_MAX_CENTER_DISTANCE and
+           abs(db_ring['radius'] - res['radius'] < REAL_MAX_RADIUS_DISTANCE) for res in found_circles):
       missed_circles.append(db_ring)
 
   return found_circles, fake_circles, missed_circles
@@ -102,8 +100,8 @@ def removeDuplicates( results ):
     unique = True
 
     for dic in sorted_results:
-      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < 0.05 and\
-         (abs(circle['radius'] - dic['radius']) < 0.05):
+      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < DUPLICATE_MAX_CENTER_DISTANCE and\
+         (abs(circle['radius'] - dic['radius']) < DUPLICATE_MAX_RADIUS_DISTANCE):
         unique = False
         break
     if unique:
@@ -119,35 +117,42 @@ def efficiency():
   fake_circles = 0
   tot_circles = 0
   counter = 0
+  tooManyCircles = []
   for pkl in pkls:
     allRings = pkl[1]['allRings']
-    noDuplicates = removeDuplicates(allRings)
+    result = removeDuplicates(allRings)
     # pdb.set_trace()
     db_entry = db[int(pkl[0])]['rings']
     rings = copy.deepcopy(db_entry)
     tot_circles += len(db_entry)
-    found, fake, missed = compareRings(db_entry, noDuplicates)
+    found, fake, missed = compareRings(db_entry, result)
     found_circles += len(found)
     fake_circles += len(fake)
     missed_circles += len(missed)
-    if len(found) > len(rings):
-      print pkl[0]
 
-    counter += 1
-    if not counter%100:
-      progress = 100*float(counter)/10000
-      print('Progress: %.2f %%' % progress, end='\r')
+
+    if len(found) > len(rings):
+      # print(len(found), len(rings))
+      tooManyCircles.append(pkl[0])
+      
+
+    # counter += 1
+    # if not counter%100:
+    #   progress = 100*float(counter)/10000
+    #   print('Progress: %.2f %%' % progress, end='\r')
     if MAKEPLOTS:
       data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
       x,y = zip(*data['allPoints'])
-      destPathSim = basePath+'img/'+pkl[0]+'.pdf'
-      destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
+      destPathSim = basePath+'img/'+pkl[0]+'withDuplicates.pdf'
+      # destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
       plotData(x,y,found,savePath=destPathSim)
-      plotData(x,y,rings,savePath=destPathReal)
+      # plotData(x,y,rings,savePath=destPathReal)
 
-  print "ratio of found circles over total circles: %s" % (found_circles/float(tot_circles))
-  print "wrongly found circles: %s" % fake_circles
-  print "missed circles: %s" % missed_circles
+  print("ratio of found circles over total circles: %s" % (found_circles/float(tot_circles)))
+  print("wrongly found circles: %s" % fake_circles)
+  print("missed circles: %s" % missed_circles)
+  print("Events were too many circles were found %s" % len(tooManyCircles))
+
 
     
 
