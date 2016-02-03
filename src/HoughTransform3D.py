@@ -9,6 +9,7 @@ from Tools import *
 
 DIMENSION=200
 R_DIMENSION=100
+THRESHOLD=3500
 
 VISUALISATION=True
 
@@ -31,7 +32,7 @@ def HoughTransform3D( data, name ):
     index = np.argmax( weights )
     rr,jj,ii = np.unravel_index( index, (R_DIMENSION, DIMENSION, DIMENSION))
     score = weights.max()
-    if score < 3500:
+    if score < THRESHOLD:
       print 'finished after %s circle(s) found' % circle_counter
       break
     print "(x,y,r): (%s,%s,%s)" % (ii, jj, rr)
@@ -84,7 +85,7 @@ def HoughTransform3D( data, name ):
     
   data['allPoints'] += used_xy
   x,y = zip(*data['allPoints'])
-  plotData(x,y,circles, savePath='../img/3D_HT/result_%s.pdf' % name)
+  plotData(x,y,circles, savePath='../img/3D_HT/result_%s_%s.pdf' % (name, THRESHOLD))
   plotData(x,y,getCirclesFromData(data), savePath='../img/3D_HT/real_result_%s.pdf' % name)
 
 

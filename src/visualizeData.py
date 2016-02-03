@@ -2,7 +2,14 @@ import sys
 import pprint
 from Tools import readFile, S_OK, S_ERROR
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+
+font = {'weight' : 'normal',
+        'size'   : 18}
+
+matplotlib.rc('font', **font)
+
 
 def convertTuplesToList( tuples ):
   x,y = [],[]
@@ -15,9 +22,10 @@ def convertTuplesToList( tuples ):
 
 def plotData( x,y, circles, savePath=None ):
   colors = ['b','g','r','c','m','y']
-  font = {'weight' : 'normal',
-        'size'   : 18}
-  plt.rc('font', **font)
+  # font = {'weight' : 'normal',
+  #         'weight' : 'bold',
+  #       'size'   : 18}
+  # plt.rc('font', **font)
   plt.rcParams['lines.linewidth'] = 1.2
   my_dpi = 96
   plt.figure(figsize=(800/my_dpi, 800/my_dpi), dpi=my_dpi)
@@ -26,8 +34,8 @@ def plotData( x,y, circles, savePath=None ):
 
   
   fig = plt.gcf()
-  plt.xlabel('$x$ [m]')
-  plt.ylabel('$y$ [m]')
+  plt.xlabel('$x$ [m]',fontsize=22)
+  plt.ylabel('$y$ [m]',fontsize=22)
   i = 0
   for circle in circles:
     c = plt.Circle( circle['center'], circle['radius'], color=colors[i%6],fill=False)

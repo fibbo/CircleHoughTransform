@@ -19,7 +19,7 @@ from scipy import misc as sp
 from visualizeData import plotData, convertTuplesToList
 from artificial_circle import generateCircle
 
-from Tools import readFile, S_ERROR, S_OK, combinations
+from Tools import readFile, S_ERROR, S_OK, combinations, norm
 from timer import Timer
 
 from parameters import *
@@ -90,14 +90,17 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
   """
   r = []
   xy = []
-
+  data = []
   for points in combinationsList:
     A = points[0]
     B = points[1]
     C = points[2]
-    a = np.linalg.norm( C - B )
-    b = np.linalg.norm( C - A )
-    c = np.linalg.norm( B - A )
+    # a = np.linalg.norm( C - B )
+    # b = np.linalg.norm( C - A )
+    # c = np.linalg.norm( B - A )
+    a = norm(C,B)
+    b = norm(C,A)
+    c = norm(B,A)
     #maximum distance between 2 points on a circle is 2*r, we know r shouldn't be bigger than 0.15 so if 2
     #points are further apart this triple isn't interesting for us
     
@@ -120,10 +123,11 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
         lambda3 = c2 * ( a2 + b2 - c2 )
         P = np.column_stack( ( A, B, C ) ).dot( np.hstack( ( lambda1, lambda2, lambda3 ) ) )
         P /= lambda1 + lambda2 + lambda3
-        xy.append( (P[0],P[1]) )
-        r.append(R)
+        data.append((R,(P[0],P[1])))
+        # xy.append( (P[0],P[1]) )
+        # r.append(R)
 
-  return xy, r
+  return data
 
 
 def main( combinationsList, n ):
@@ -135,10 +139,9 @@ def main( combinationsList, n ):
   @returns: S_OK( resList ): resList is a list of dictionaries of possible circles.
 
   """
-  xy, r = calculateCircleFromPoints( combinationsList )
-  
+  data = calculateCircleFromPoints( combinationsList ) # xy, r
   #fullCenterHistogram( xy )
-  data = zip(r, xy)
+  # data = zip(r, xy)
   dtype = [('radius', float), ('center', tuple)]
   data = np.array(data,dtype=dtype)
   res = SHistogram(data, NUMBER_OF_R_BINS, [0,1])
@@ -159,12 +162,12 @@ def main( combinationsList, n ):
 
   # visualizeRadiusHistogram(radius)
 
-  radiuses, center_data = extractRadius(radius)
+  rc_data = extractRadius(radius) #radiuses, center_data
 
   res = []
 
   # check for each radius if we have a peak in center_data
-  for radius, center in zip(radiuses, center_data):
+  for radius, center in rc_data:
     x,y = zip(*center)
     H, xedges, yedges = np.histogram2d(x,y,NUMBER_OF_S_BINS,[[-0.5, 0.5], [-0.5, 0.5]])
     center_dict = {}
@@ -186,8 +189,7 @@ def extractRadius( radius_dict ):
       :param dict radius: radius dicitonary with 'H' histogram, 'xedges' and 'yedges'
       :returns radius, center_data
   """
-  radiuses = []
-  center_data = []
+  data = []
   H = radius_dict['H']
   edges = radius_dict['xedges']
   center = radius_dict['center_data']
@@ -199,16 +201,17 @@ def extractRadius( radius_dict ):
       # there are less than 200 entries in 3 bins
       break
 
-    radiuses.append(edges[i])
+    # radiuses.append(edges[i])
     index_list = range(i-1 if i>0 else i,i+2 if i<n-1 else i+1)
     center_list = []
     for index in index_list:
       if center[index]:
         center_list += center[index]
       H[index] = 0
-    center_data.append(center_list)
+    # center_data.append(center_list)
+    data.append((edges[i],center_list))
          
-  return radiuses, center_data 
+  return data 
 
 def extractCenter( center_dict ):
   """ Simple method to find possible circle centers. Find highest entry in histogram save the value and set bin to 0 so we can look for the next.
@@ -286,7 +289,7 @@ def visualizeRadiusHistogram( radius ):
     plt.bar(edges,H, width=step)
     plt.xlim(0 , 0.15)
     
-    plt.show()
+    plt.savefig('../img/radius_histogram_%s.pdf' % EVENTNUMBER)
 
 
 def setUp( path ):
@@ -363,7 +366,7 @@ if __name__ == '__main__':
     # removing double entries
     #circles = removeFakes(res)
   if EVENTNUMBER:
-    pickle.dump( pickle_data, open(EVENTNUMBER+".pkl", 'wb'))
+    pickle.dump( pickle_data, open('../analysis/localPKLs/'+EVENTNUMBER+".pkl", 'wb'))
     # now we compare the algorithm results with the real data
   else:
     plotData(x,y,res)

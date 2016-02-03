@@ -1,4 +1,3 @@
-from __future__ import print_function
 import pdb
 import os
 import cPickle as pickle
@@ -11,7 +10,8 @@ from Tools import *
 import copy
 from parameters import *
 
-basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run01/"
+basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run05/"
+run = basePath[-6:-1]
 directories = sorted(os.listdir(basePath))
 db = pickle.load(open("/home/phi/workspace/CircleHT/src/db.pkl", 'rb'))
 filefolder = "/home/phi/workspace/CircleHT/data/lhcb_data/"
@@ -55,7 +55,9 @@ def runtimeVsPoints():
     runtime.append(res['Runtime'])
     nPoints.append(res['nPoints'])
   plt.scatter(nPoints, runtime)
-  plt.savefig('runtime_vs_points_run05.png')
+  plt.xlabel('points')
+  plt.ylabel('time [s]')
+  plt.savefig('../img/runtime_vs_points_'+run+'.pdf')
 
 def compareRings( db_rings, results):
   """ Compare rings find by the algorithm with the known results from the pickle database. If any circle from the algorithm is within a certain
@@ -71,7 +73,16 @@ def compareRings( db_rings, results):
   fake_circles = []
 
   results = sorted(results, key=lambda k: k['nEntries'], reverse=True)
-  # if 
+  # if not kwargs:
+  #   max_center_distance = REAL_MAX_CENTER_DISTANCE
+  #   max_radius_distance = REAL_MAX_RADIUS_DISTANCE
+  # else:
+  #   for key in kwargs:
+  #     if key=='radius':
+  #       max_radius_distance = kwargs[key]
+  #     if key=='center':
+  #       max_center_distance = kwargs[key]
+
   while len(results):
     result_ring = results.pop()
     if any(abs(np.linalg.norm(np.array(result_ring['center']) - np.array(db_ring['center']))) < REAL_MAX_CENTER_DISTANCE and\
@@ -89,79 +100,155 @@ def compareRings( db_rings, results):
   return found_circles, fake_circles, missed_circles
 
 
-def removeDuplicates( results ):
+def removeDuplicates( results, **kwargs ):
   """ 
 
   """
   res = []
   sorted_results = sorted( results, key=lambda k: k['nEntries'], reverse=True)
+  if not kwargs:
+    max_center_distance = DUPLICATE_MAX_CENTER_DISTANCE
+    max_radius_distance = DUPLICATE_MAX_RADIUS_DISTANCE
+
+  else:
+    for key in kwargs:
+      if key=='radius':
+        max_radius_distance = kwargs[key]
+      if key=='center':
+        max_center_distance = kwargs[key]
   while len(sorted_results):
     circle = sorted_results.pop()
     unique = True
 
-    for dic in sorted_results:
-      if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < DUPLICATE_MAX_CENTER_DISTANCE and\
-         (abs(circle['radius'] - dic['radius']) < DUPLICATE_MAX_RADIUS_DISTANCE):
-        unique = False
-        break
+    if any( (np.linalg.norm(np.array(circle['center']) - np.array(dic['center'])) < max_center_distance) and (abs(circle['radius'] - dic['radius']) < max_radius_distance) for dic in sorted_results ):
+      unique=False
+    # for dic in sorted_results:
+    #   if (np.linalg.norm(np.array(circle['center']) - np.array(dic['center']))) < max_center_distance and\
+    #      (abs(circle['radius'] - dic['radius']) < max_radius_distance):
+    #     unique = False
+    #     break
     if unique:
       res.append(circle)
 
   return res
 
 
-def efficiency():
+def totalEfficiency(**kwargs):
   pkls = getPKLs()
   found_circles = 0
   missed_circles = 0
   fake_circles = 0
   tot_circles = 0
   counter = 0
-  tooManyCircles = []
+  containsDuplicates = []
+  missedDuplicates = 0
+  if not kwargs:
+    print pkls[0][1]['Parameters']
   for pkl in pkls:
     allRings = pkl[1]['allRings']
-    result = removeDuplicates(allRings)
+    if kwargs:
+      result = removeDuplicates(allRings, radius=kwargs['radius'], center=kwargs['center'])
+    else:
+      result = removeDuplicates(allRings)
     # pdb.set_trace()
     db_entry = db[int(pkl[0])]['rings']
     rings = copy.deepcopy(db_entry)
     tot_circles += len(db_entry)
-    found, fake, missed = compareRings(db_entry, result)
+    resultrings = copy.deepcopy(result)
+    found, fake, missed = compareRings(rings, result)
     found_circles += len(found)
     fake_circles += len(fake)
+    if len(fake):
+      containsDuplicates.append(pkl[0])
     missed_circles += len(missed)
-
-
-    if len(found) > len(rings):
-      # print(len(found), len(rings))
-      tooManyCircles.append(pkl[0])
-      
-
-    # counter += 1
-    # if not counter%100:
-    #   progress = 100*float(counter)/10000
-    #   print('Progress: %.2f %%' % progress, end='\r')
+    # if not len(found)+len(missed)==len(db_entry):
+    #   print pkl[0]
     if MAKEPLOTS:
       data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
       x,y = zip(*data['allPoints'])
-      destPathSim = basePath+'img/'+pkl[0]+'withDuplicates.pdf'
-      # destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
+      destPathSim = basePath+'img/'+pkl[0]+'_afterCleanup.pdf'
+      destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
+      destPathPure = basePath+'img/'+pkl[0]+'_pure.pdf'
       plotData(x,y,found,savePath=destPathSim)
-      # plotData(x,y,rings,savePath=destPathReal)
+      plotData(x,y,resultrings,savePath=destPathPure)  
+      plotData(x,y,rings,savePath=destPathReal)
+  if not kwargs:
+    print("efficiency: %s" % ((tot_circles-missed_circles)/float(tot_circles)))
+    print("fake efficiency: %s" % (fake_circles/float(tot_circles)))
+    print("missed: %s" % missed_circles)
+    print("fakes: %s" % fake_circles)
+    efficiency = ((tot_circles-missed_circles)*100/float(tot_circles))
+    ghostrate = (fake_circles*100/float(tot_circles))
+    print("%.3f & %.3f & %.2f\%% & %s & %.2f\%% & %s \\\\" % (DUPLICATE_MAX_RADIUS_DISTANCE, DUPLICATE_MAX_CENTER_DISTANCE, efficiency, missed_circles, ghostrate, fake_circles))
+    # print containsDuplicates
+  else:
+    efficiency = ((tot_circles-missed_circles)*100/float(tot_circles))
+    ghostrate = (fake_circles*100/float(tot_circles))
+    print("%.3f & %.3f & %.2f\%% & %s & %.2f\%% & %s \\\\" % (kwargs['radius'], kwargs['center'], efficiency, missed_circles, ghostrate, fake_circles))
 
-  print("ratio of found circles over total circles: %s" % (found_circles/float(tot_circles)))
-  print("wrongly found circles: %s" % fake_circles)
-  print("missed circles: %s" % missed_circles)
-  print("Events were too many circles were found %s" % len(tooManyCircles))
+def singleEfficiency(MAKEPLOTS, EVENTNUMBER):
+  pkls = getPKLs()
+  for pkl in pkls:
+    if pkl[0] == EVENTNUMBER:
+      allRings = pkl[1]['allRings']
+      db_entry = db[int(pkl[0])]['rings']
+      rings = copy.deepcopy(db_entry)
+      result = removeDuplicates(allRings)
+      found, fake, missed = compareRings(db_entry, result)
 
+      if MAKEPLOTS:
+        data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
+        x,y = zip(*data['allPoints'])
+        destPathSim = basePath+'img/'+pkl[0]+'.pdf'
+        destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
+        plotData(x,y,found,savePath=destPathSim)
+        plotData(x,y,rings,savePath=destPathReal)
 
-    
+      print("Circles that don't have a match in the event: %s" % len(fake))
+      print("Missed circles: %s" % len(missed))
+      break
+
+def localSingleEfficiency(MAKEPLOTS, EVENTNUMBER):
+  pkl = (EVENTNUMBER, pickle.load(open('../analysis/localPKLs/'+EVENTNUMBER+'.pkl','rb')))
+  allRings = pkl[1]['allRings']
+  db_entry = db[int(pkl[0])]['rings']
+  rings = copy.deepcopy(db_entry)
+  result = removeDuplicates(allRings)
+  resultrings = copy.deepcopy(result)
+  found, fake, missed = compareRings(db_entry, result)
+
+  if MAKEPLOTS:
+    data = readFile(filefolder+'Event0000'+pkl[0]+'.txt')
+    x,y = zip(*data['allPoints'])
+    destPathSim = basePath+'img/'+pkl[0]+'_afterCleanup.pdf'
+    destPathReal = basePath+'img/'+pkl[0]+'_real.pdf'
+    destPathPure = basePath+'img/'+pkl[0]+'_pure.pdf'
+    plotData(x,y,found,savePath=destPathSim)
+    plotData(x,y,resultrings,savePath=destPathPure)  
+    plotData(x,y,rings,savePath=destPathReal)
+
+  print("Circles that don't have a match in the event: %s" % len(fake))
+  print("Missed circles: %s" % len(missed))
+  print("Found/Real %s/%s" % (len(found),len(rings)))
 
 
 if __name__=='__main__':
   #res = resultLoop(missDuplicates)
   #print res
-  if len(sys.argv)==2:
-    MAKEPLOTS = sys.argv[1]
-  else:
-    MAKEPLOTS = False
-  efficiency()
+  cuts = np.arange(0.003,0.012,0.003)
+  centers = [0.003]
+  runtimeVsPoints()
+  # if len(sys.argv)>=2:
+  #   MAKEPLOTS = sys.argv[1]
+  # else:
+  #   MAKEPLOTS = False
+  # if len(sys.argv)==3:
+  #   EVENTNUMBER=sys.argv[2]
+  #   localSingleEfficiency(MAKEPLOTS, EVENTNUMBER)
+  # else:
+  #   if False:
+  #     for radius in cuts:
+  #       for center in centers:
+  #         totalEfficiency(radius=radius, center=center)
+  #   else:
+  #     totalEfficiency()

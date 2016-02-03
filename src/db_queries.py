@@ -1,12 +1,21 @@
 import pickle
 import os
 import numpy as np
-
+import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
+from scipy.stats import poisson
+import pdb
 
 f = open('db.pkl')
 
 db = pickle.load(f)
+
+font = {'weight' : 'bold',
+        'size'   : 16}
+
+matplotlib.rc('font', **font)
+
 
 def findMaxRadius( db ):
   max_radius = 0
@@ -45,19 +54,38 @@ def getCircleData( db, eventnumber ):
     print "nPe: %s" % ring['nPe']
     print "radius: %s" % ring['radius']
 
-    
+def plotRadiusDistribution():
+  radius_list = []
+  for entry in db:
+    for ring in entry['rings']:
+      radius_list.append(ring['radius'])
+
+  plt.hist(radius_list, 40,alpha=0.6,color='g')
+  plt.xlabel('radius [m]')
+  plt.ylabel('# of entries')
+  plt.xlim(0.05,0.13)
+  plt.savefig('../img/radiusDist.pdf')
 
 def pointsPerCircleDistribution( ):
   points = []
   for entry in db:
-    for rings in entry['rings']:
-      points.append(rings['nPe'])
+    for ring in entry['rings']:
+      points.append(float(ring['nPe']))
 
-  bins = np.linspace(1,45,45)
-  plt.hist(points,bins)
-  plt.show()
+  # mu, std = poisson.fit(points)
 
-def ratioOfCirclesMoreThanXPoints(x=8):
+  n, bins, patches = plt.hist(points,np.arange(5,45)-0.5,normed=False,alpha=0.6,color='g')
+  # xmin, xmax = plt.xlim()
+  # x = np.linspace(xmin, xmax, 100)
+  # p = poisson.pdf(x, mu, std)
+  # plt.plot(x, p, 'k', linewidth=2)
+  # plt.title('$\mu=%.3f,\ \sigma=%.3f$' % (mu, std))
+  plt.ylabel('# of circles')
+  plt.xlabel('# of points')
+  plt.savefig('../img/ppc.pdf')
+  plt.close()
+
+def ratioOfCirclesMoreThanXPoints(x=10):
   s_circle = 0
   b_circle = 0
   for entry in db:
@@ -67,18 +95,21 @@ def ratioOfCirclesMoreThanXPoints(x=8):
       else:
         s_circle += 1
 
+  print s_circle
   return b_circle/float(s_circle+b_circle)
 
 
 def plotRatioOfCirclesWithMoreThanXPoints():
   result = []
-  for x in range(8,40):
+  for x in range(1,40):
     result.append(ratioOfCirclesMoreThanXPoints(x))
 
   plt.plot(result)
   plt.yticks(np.arange(0, 1, 0.1))
-  plt.ylabel('Ratio of circles bigger than $x$ over the total number of circles')
-  plt.show()
+  plt.title('circles with more than $x$ points')
+  plt.xlabel('number of points per circle')
+  plt.ylabel('ratio')
+  plt.savefig('../img/ratio_ppc.pdf')
 
 
 def ringsPerEventDistribution( db ):
@@ -86,12 +117,15 @@ def ringsPerEventDistribution( db ):
   for entry in db:
     rings.append( len(entry['rings'] ) )
 
-  print len(rings)
-  bins = np.linspace(1,40,40)
-  plt.hist(rings,bins)
-  plt.show()
+  plt.hist(rings,np.arange(1,15)-0.5, alpha=0.6,color='g')
+  plt.xticks(range(14))
+  plt.xlabel('# of circles')
+  plt.ylabel('# of events')
+  plt.title('Circle per event distribution')
+  plt.savefig('../img/circlePerEventDistribution.pdf')
+  plt.close()
 
-def maxPoints( db ):
+def maxPoints():
   maxPoints = 0
   for i,event in enumerate(db):
     nPoints = 0
@@ -104,13 +138,4 @@ def maxPoints( db ):
       eventnumber = i
   print eventnumber
 
-# maxPoints( db )
-#print db[3]
-#ringsPerEventDistribution( db )
-#pointsPerCircleDistribution(db)
-#print findDataWithXCircles(db, 4)
-#getCircleData( db, 9999)
-# print findCircleWithLeastPoints(db)
-#print findMaxRadius( db )
-print db
-# plotRatioOfCirclesWithMoreThanXPoints()
+maxPoints()
