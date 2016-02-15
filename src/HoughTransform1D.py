@@ -20,13 +20,13 @@ def HoughTransform1D( data,name ):
   for center in data['Center']:
     weights = np.zeros(DIMENSION)
     for x0,y0 in data['allPoints']:
-      s = 2*0.001
+      s = 0.001
       eta = (center[0]-x0)**2 + (center[1]-y0)**2 - r**2
       weights += 1. / ( sqrt( 2 * sconst.pi ) * s ) * np.exp( -( eta ** 2 ) / ( 2 * s ** 2 ) )
     lines = plt.plot(np.linspace(0,1,DIMENSION),weights)
     plt.setp(lines, linewidth=1.5, color='b')
     plt.xlim(0.,0.5)
-    plt.ylim(0,4500)
+    # plt.ylim(0,4500)
     plt.xlabel('radius')
     plt.ylabel('score')
     plt.xticks(np.arange(0, 1, 0.1))
@@ -37,7 +37,24 @@ def HoughTransform1D( data,name ):
     # plt.xlim(0,300)
     plt.savefig('../img/1D_HT/radius_scores_%s_%s.pdf' % (name, counter))
     plt.close()
+
+    plt.bar(r,weights, width=0.001)
+    plt.xlabel('radius')
+    plt.ylabel('score')
+    plt.xticks(np.arange(0, 1, 0.1))
+    plt.savefig('../img/1D_HT/radius_bar_scores_%s_%s.pdf' % (name, counter))
+    plt.close()
     index = np.argmax(weights)
+    clearRange = 20
+    print "Score: %s" % weights[index]
+    for i in range(index-clearRange,index+clearRange):
+      try:
+        weights[i] = 0
+      except IndexError:
+        continue
+
+    index2 = np.argmax(weights)
+    print "Second highest score: %s" % weights[index2]
     circle = {}
     circle['center'] = center
     circle['radius'] = r[index]

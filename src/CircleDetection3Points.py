@@ -112,7 +112,7 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
     
     #maximum radius is 0.15 everything larger we forget
     if R<MAX_POINT_DISTANCE/2:
-      if onlyRadius:
+      if ONLY_RADIUS:
         r.append(R)
       else: 
         a2 = a*a
@@ -126,7 +126,8 @@ def calculateCircleFromPoints(combinationsList, onlyRadius=False):
         data.append((R,(P[0],P[1])))
         # xy.append( (P[0],P[1]) )
         # r.append(R)
-
+  if ONLY_RADIUS:
+    return r
   return data
 
 
@@ -140,6 +141,16 @@ def main( combinationsList, n ):
 
   """
   data = calculateCircleFromPoints( combinationsList ) # xy, r
+  if ONLY_RADIUS:
+    filename = sys.argv[1][-10:-4]
+    ofile = open(filename+'_radius.txt', 'wb')
+    hist, bins, patches = plt.hist(data,np.linspace(0,1.,100),alpha=0.6,color='g')
+    for line in hist:
+      print>>ofile, line
+    
+    ofile.close()
+    return S_OK()
+
   #fullCenterHistogram( xy )
   # data = zip(r, xy)
   dtype = [('radius', float), ('center', tuple)]
@@ -160,7 +171,7 @@ def main( combinationsList, n ):
   radius['xedges'] = edges
   radius['center_data'] = center_data
 
-  # visualizeRadiusHistogram(radius)
+  visualizeRadiusHistogram(radius)
 
   rc_data = extractRadius(radius) #radiuses, center_data
 
@@ -369,7 +380,8 @@ if __name__ == '__main__':
     pickle.dump( pickle_data, open('../analysis/localPKLs/'+EVENTNUMBER+".pkl", 'wb'))
     # now we compare the algorithm results with the real data
   else:
-    plotData(x,y,res)
+    if res:
+      plotData(x,y,res)
    # if EVENTNUMBER:
    #   plotData(x,y,found_circles,savePath=EVENTNUMBER+".png")
    #   if len(fake_circles):

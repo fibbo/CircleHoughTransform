@@ -25,7 +25,7 @@ def HoughTransform2D( data, name ):
   counter = 1
   circles = []
   used_xy = []
-  s = 0.0005
+  s = 0.001
   combined = zip(data['Radius'], data['Center'])
   shuffle(combined)
   data['Radius'][:], data['Center'][:] = zip(*combined)
@@ -40,20 +40,32 @@ def HoughTransform2D( data, name ):
       cba = plt.colorbar(img)
       plt.xlabel('$x$')
       plt.ylabel('$y$')
-      plt.savefig('../img/2D_HT/center_scores_%s_%s.pdf' % (name, counter))
+      plt.savefig('../img/2D_HT/center_scores_%s_%s_newsigma.pdf' % (name, counter))
       plt.close()
     index = np.argmax(weights)
-    j, i = np.unravel_index( index, (DIMENSION, DIMENSION))
+    i, j = np.unravel_index( index, (DIMENSION, DIMENSION))
 
     if PLOT_PROJECTION:
-      for jj in range(j-5,j+5):
-        plt.plot(x, weights[:][jj])
+      for slice_index in range(i-5,i+5):
+        plt.plot(x, weights[:][slice_index])
         plt.xlim(-0.5,0.5)
         # plt.close()
-        plt.savefig('../img/2D_HT/projection/stacked_projection_%s_%s.pdf' % ((jj-j+5), counter))
+        plt.savefig('../img/2D_HT/projection/stacked_projection_%s_%s.pdf' % ((slice_index-i+5), counter))
+
+
+    print "Score: %s - (%s, %s)" % (weights[i,j],x[j],y[i])
+    clearRange = 20
+    for xx in range(i-clearRange,i+clearRange):
+      for yy in range(j-clearRange,j+clearRange):
+        weights[xx,yy] = 0
+
+    index2 = np.argmax(weights)
+    ii, jj = np.unravel_index( index2, (DIMENSION, DIMENSION))
+    print "2nd highest score: %s - (%s, %s)" % (weights[ii,jj],x[jj],y[ii])
+
 
     circle = {}
-    circle['center'] = (x[i], y[j])
+    circle['center'] = (x[j], y[i])
     circle['radius'] = r
     circles.append(circle)
     counter += 1
@@ -70,9 +82,10 @@ def HoughTransform2D( data, name ):
 
   # data['allPoints'] += used_xy
   x,y = zip(*data['allPoints'])
-  plotData(x,y,circles,savePath='../img/2D_HT/result_%s.pdf' % name)
-  rcircles = getCirclesFromData(data)
-  plotData(x,y,rcircles,savePath='../img/2D_HT/real_result_%s.pdf' % name)
+  if VISUALISATION:
+    plotData(x,y,circles,savePath='../img/2D_HT/result_%s_newsigma.pdf' % name)
+    rcircles = getCirclesFromData(data)
+    plotData(x,y,rcircles,savePath='../img/2D_HT/real_result_%s_newsigma.pdf' % name)
 
 
 

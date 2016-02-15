@@ -32,11 +32,13 @@ def HoughTransform3D( data, name ):
     index = np.argmax( weights )
     rr,jj,ii = np.unravel_index( index, (R_DIMENSION, DIMENSION, DIMENSION))
     score = weights.max()
+    print "(x,y,r): (%s,%s,%s)" % (ii, jj, rr)
+    print "score: %s" % score
+
     if score < THRESHOLD:
       print 'finished after %s circle(s) found' % circle_counter
       break
-    print "(x,y,r): (%s,%s,%s)" % (ii, jj, rr)
-    print "score: %s" % score
+
     circle_counter += 1
     circle = {}
     circle['center'] = (x[ii], y[jj])
