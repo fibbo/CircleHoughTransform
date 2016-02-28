@@ -66,23 +66,23 @@ def HoughTransform3D( data, name ):
     #     plt.savefig('../img/3D_HT/slices/r_slices_%s_%s_circle%s.pdf' % (name, r_i, circle_counter))
     #     plt.close()
     
-    # if VISUALISATION:
-      # ux, uy = zip(*used_xy)
-      # fig = plt.figure()
-      # ax1 = fig.add_subplot(211)
-      # ax1.scatter(ux, uy,c='r')
-      # plt.xlim(-0.5,0.5)
-      # plt.ylim(-0.5,0.5)
-      # if data['allPoints']:
-      #   ox, oy = zip(*data['allPoints'])
-      #   ax2 = fig.add_subplot(212)
-      #   ax2.scatter(ox, oy)
-      # plt.xlim(-0.5,0.5)
-      # plt.ylim(-0.5,0.5)
-      # plt.show()
-      # print ii,jj,rr
+    if VISUALISATION:
+      ux, uy = zip(*used_xy)
+      fig = plt.figure()
+      ax1 = fig.add_subplot(211)
+      ax1.scatter(ux, uy,c='r')
+      plt.xlim(-0.5,0.5)
+      plt.ylim(-0.5,0.5)
+      if data['allPoints']:
+        ox, oy = zip(*data['allPoints'])
+        ax2 = fig.add_subplot(212)
+        ax2.scatter(ox, oy)
+      plt.xlim(-0.5,0.5)
+      plt.ylim(-0.5,0.5)
+      plt.show()
+      print ii,jj,rr
 
-      # plt.show()
+      plt.show()
       
     
   data['allPoints'] += used_xy

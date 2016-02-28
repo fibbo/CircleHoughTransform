@@ -46,7 +46,7 @@ def HoughTransform2D( data, name ):
     i, j = np.unravel_index( index, (DIMENSION, DIMENSION))
 
     if PLOT_PROJECTION:
-      for slice_index in range(i-5,i+5):
+      for slice_index in range(i-4,i+5,4):
         plt.plot(x, weights[:][slice_index])
         plt.xlim(-0.5,0.5)
         # plt.close()

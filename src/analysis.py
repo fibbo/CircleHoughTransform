@@ -5,19 +5,20 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy
 from visualizeData import *
 from Tools import *
 import copy
 from parameters import *
 
 basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run05/"
-run = basePath[-6:-1]
 directories = sorted(os.listdir(basePath))
-db = pickle.load(open("/home/phi/workspace/CircleHT/src/db.pkl", 'rb'))
 filefolder = "/home/phi/workspace/CircleHT/data/lhcb_data/"
 
+def loadDB():
+  return pickle.load(open("/home/phi/workspace/CircleHT/src/db.pkl", 'rb'))
 
-def getPKLs():
+def getPKLs(basePath):
   pkls = []
   for directory in directories:
     path = os.path.join(basePath, directory)
@@ -47,17 +48,33 @@ def missedRings(rings, db_rings):
   return missedRings
 
 def runtimeVsPoints():
-  runtime = []
-  nPoints = []
+
+  points = np.arange(120,500)
+  for i in range(1,8):
+    runtime = []
+    nPoints = []
+    basePath = "/home/phi/workspace/CircleHT/analysis/Threshold/split/run0%s/" % i
+    pkls = getPKLs(basePath)
+    run = basePath[-6:-1]
+    for pkl in pkls:
+      res = pkl[1]
+      runtime.append(res['Runtime'])
+      nPoints.append(res['nPoints'])
+    plt.scatter(nPoints, runtime)
+    plt.plot(points, 1.8e-5*points**3/6, 'r--')
+    plt.xlabel('points')
+    plt.ylabel('time [s]')
+    plt.savefig('../img/runtime_vs_points_'+run+'.pdf')
+    plt.close()
+
+def countRings():
   pkls = getPKLs()
+  rings = 0
   for pkl in pkls:
     res = pkl[1]
-    runtime.append(res['Runtime'])
-    nPoints.append(res['nPoints'])
-  plt.scatter(nPoints, runtime)
-  plt.xlabel('points')
-  plt.ylabel('time [s]')
-  plt.savefig('../img/runtime_vs_points_'+run+'.pdf')
+    rings += len(res['allRings'])
+
+  print rings
 
 def compareRings( db_rings, results):
   """ Compare rings find by the algorithm with the known results from the pickle database. If any circle from the algorithm is within a certain
@@ -142,6 +159,7 @@ def totalEfficiency(**kwargs):
   counter = 0
   containsDuplicates = []
   missedDuplicates = 0
+  db = loadDB()
   if not kwargs:
     print pkls[0][1]['Parameters']
   for pkl in pkls:
@@ -187,6 +205,7 @@ def totalEfficiency(**kwargs):
     print("%.3f & %.3f & %.2f\%% & %s & %.2f\%% & %s \\\\" % (kwargs['radius'], kwargs['center'], efficiency, missed_circles, ghostrate, fake_circles))
 
 def singleEfficiency(MAKEPLOTS, EVENTNUMBER):
+  db = loadDB()
   pkls = getPKLs()
   for pkl in pkls:
     if pkl[0] == EVENTNUMBER:
@@ -209,6 +228,7 @@ def singleEfficiency(MAKEPLOTS, EVENTNUMBER):
       break
 
 def localSingleEfficiency(MAKEPLOTS, EVENTNUMBER):
+  db = loadDB()
   pkl = (EVENTNUMBER, pickle.load(open('../analysis/localPKLs/'+EVENTNUMBER+'.pkl','rb')))
   allRings = pkl[1]['allRings']
   db_entry = db[int(pkl[0])]['rings']

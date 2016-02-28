@@ -95,7 +95,7 @@ def ratioOfCirclesMoreThanXPoints(x=10):
       else:
         s_circle += 1
 
-  print s_circle
+  #print s_circle
   return b_circle/float(s_circle+b_circle)
 
 
@@ -138,4 +138,4 @@ def maxPoints():
       eventnumber = i
   print eventnumber
 
-maxPoints()
+print ratioOfCirclesMoreThanXPoints(13)
